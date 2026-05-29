@@ -1,0 +1,7 @@
+# Ignore large intermediate output files - only signals CSVs and meta.json are needed
+*.xlsx
+*.xls
+*.csv.bak
+# Keep these:
+!signals_*.csv
+!meta.json
