@@ -2073,6 +2073,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button id="port-f-all" class="btn-filter active" onclick="portFilter('ALL',this)">All</button>
       <button id="port-f-open" class="btn-filter" onclick="portFilter('Open',this)">Open (No Target)</button>
       <button id="port-f-closed" class="btn-filter" onclick="portFilter('Closed',this)">Closed (Target Hit)</button>
+      <button class="btn-sm" style="background:#16a34a;color:#fff;margin-left:auto;" onclick="exportPortfolioCSV()">&#11015; CSV</button>
+      <button class="btn-sm" style="background:#1d4ed8;color:#fff;" onclick="exportPortfolioExcel()">&#11015; Excel</button>
     </div>
     <div class="table-area">
       <table><thead><tr>
@@ -4205,6 +4207,76 @@ function savePAT() {
   const pat = (document.getElementById('pat-input').value || '').trim();
   if (pat) { localStorage.setItem('btst_gh_pat', pat); toast('PAT saved ✓', 'success'); }
   document.getElementById('pat-modal').classList.add('hidden');
+}
+
+
+// ── Portfolio Export ─────────────────────────────────────────────────────────
+function _getPortfolioExportData() {
+  let arr = getPortfolio();
+  // Refresh LTPs from latest sim data (same as renderPortfolio)
+  arr.forEach(function(p) {
+    const sym = (p.symbol || '').toUpperCase();
+    const ltp = openMap[sym] || openMap[p.symbol] || 0;
+    if (ltp) p.current_ltp = ltp;
+    if (p.avg_buy > 0 && p.current_ltp) {
+      p.status = p.current_ltp >= p.target ? 'Yes' : 'No';
+    }
+  });
+  // Apply current filter
+  const statusF = (state.portfolio || {}).status || 'ALL';
+  const searchQ = ((state.portfolio || {}).search || '').toUpperCase();
+  if (statusF === 'Open')   arr = arr.filter(p => (p.status || 'No') !== 'Yes');
+  if (statusF === 'Closed') arr = arr.filter(p => (p.status || 'No') === 'Yes');
+  if (searchQ) arr = arr.filter(p => (p.symbol || '').toUpperCase().includes(searchQ));
+  return arr.map(function(p) {
+    const avg  = parseFloat(p.avg_buy) || 0;
+    const ltp  = parseFloat(p.current_ltp) || 0;
+    const qty  = parseInt(p.qty) || 0;
+    const inv  = parseFloat((qty * avg).toFixed(2));
+    const tgt  = parseFloat(p.target) || parseFloat((avg * 1.05).toFixed(2));
+    const drop = avg > 0 ? parseFloat(((ltp - avg) / avg * 100).toFixed(2)) : 0;
+    return {
+      'Symbol':       p.symbol || '',
+      'Added Date':   p.added_date || '',
+      'Avg Buy (₹)':  avg,
+      'Qty':          qty,
+      'Investment (₹)': inv,
+      'LTP (₹)':      ltp,
+      'Drop%':        drop,
+      'Target (₹)':   tgt,
+      'Status':       p.status || 'No'
+    };
+  });
+}
+
+function exportPortfolioCSV() {
+  const rows = _getPortfolioExportData();
+  if (!rows.length) { alert('No portfolio data to export.'); return; }
+  const headers = Object.keys(rows[0]);
+  const csv = [headers.join(',')]
+    .concat(rows.map(r => headers.map(h => {
+      const v = r[h];
+      return (typeof v === 'string' && v.includes(',')) ? '"' + v + '"' : v;
+    }).join(',')))
+    .join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'portfolio_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function exportPortfolioExcel() {
+  const rows = _getPortfolioExportData();
+  if (!rows.length) { alert('No portfolio data to export.'); return; }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  // Set column widths
+  ws['!cols'] = [
+    {wch:14},{wch:12},{wch:12},{wch:6},{wch:14},{wch:10},{wch:8},{wch:12},{wch:10}
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, 'Portfolio');
+  XLSX.writeFile(wb, 'portfolio_' + new Date().toISOString().slice(0,10) + '.xlsx');
 }
 
 </script>
