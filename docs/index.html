@@ -135,6 +135,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 .brow.f .bv{color:#64748b;}
 .brow .bs{font-size:12px;color:#475569;}
 
+.fo-badge{background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -2350,6 +2351,11 @@ function orderBadge(order,status){
   return `<span class="result-badge rb-invalid">${order||'—'}</span>`;
 }
 
+
+// ── F&O Symbol Set ────────────────────────────────────────────────────────
+const FO_SYMBOLS = new Set(["360ONE", "ABB", "ABCAPITAL", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", "ADANIPOWER", "ALKEM", "AMBER", "AMBUJACEM", "ANGELONE", "APLAPOLLO", "APOLLOHOSP", "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AUBANK", "AUROPHARMA", "AXISBANK", "BAJAJ-AUTO", "BAJAJFINSV", "BAJAJHLDNG", "BAJFINANCE", "BANDHANBNK", "BANKBARODA", "BANKINDIA", "BDL", "BEL", "BHARATFORG", "BHARTIARTL", "BHEL", "BIOCON", "BLUESTARCO", "BOSCHLTD", "BPCL", "BRITANNIA", "BSE", "CAMS", "CANBK", "CDSL", "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", "COCHINSHIP", "COFORGE", "COLPAL", "CONCOR", "CROMPTON", "CUMMINSIND", "DABUR", "DALBHARAT", "DELHIVERY", "DIVISLAB", "DIXON", "DLF", "DMART", "DRREDDY", "EICHERMOT", "ETERNAL", "EXIDEIND", "FEDERALBNK", "FORCEMOT", "FORTIS", "GAIL", "GLENMARK", "GMRAIRPORT", "GODFRYPHLP", "GODREJCP", "GODREJPROP", "GRASIM", "GVT&D", "HAL", "HAVELLS", "HCLTECH", "HDFCAMC", "HDFCBANK", "HDFCLIFE", "HEROMOTOCO", "HINDALCO", "HINDPETRO", "HINDUNILVR", "HINDZINC", "HYUNDAI", "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDEA", "IDFCFIRSTB", "IEX", "INDHOTEL", "INDIANB", "INDIGO", "INDUSINDBK", "INDUSTOWER", "INFY", "INOXWIND", "IOC", "IREDA", "IRFC", "ITC", "JINDALSTEL", "JIOFIN", "JSWENERGY", "JSWSTEEL", "JUBLFOOD", "KALYANKJIL", "KAYNES", "KEI", "KFINTECH", "KOTAKBANK", "KPITTECH", "LAURUSLABS", "LICHSGFIN", "LICI", "LODHA", "LT", "LTF", "LTM", "LUPIN", "M&M", "MANAPPURAM", "MANKIND", "MARICO", "MARUTI", "MAXHEALTH", "MAZDOCK", "MCX", "MFSL", "MOTHERSON", "MOTILALOFS", "MPHASIS", "MUTHOOTFIN", "NAM-INDIA", "NATIONALUM", "NAUKRI", "NBCC", "NESTLEIND", "NHPC", "NMDC", "NTPC", "NUVAMA", "NYKAA", "OBEROIRLTY", "OFSS", "OIL", "ONGC", "PAGEIND", "PATANJALI", "PAYTM", "PERSISTENT", "PETRONET", "PFC", "PGEL", "PHOENIXLTD", "PIDILITIND", "PIIND", "PNB", "PNBHOUSING", "POLICYBZR", "POLYCAB", "POWERGRID", "POWERINDIA", "PREMIERENE", "PRESTIGE", "RADICO", "RBLBANK", "RECLTD", "RELIANCE", "RVNL", "SAIL", "SAMMAANCAP", "SBICARD", "SBILIFE", "SBIN", "SHREECEM", "SHRIRAMFIN", "SIEMENS", "SOLARINDS", "SONACOMS", "SRF", "SUNPHARMA", "SUPREMEIND", "SUZLON", "SWIGGY", "TATACONSUM", "TATAELXSI", "TATAPOWER", "TATASTEEL", "TCS", "TECHM", "TIINDIA", "TITAN", "TMPV", "TORNTPHARM", "TRENT", "TVSMOTOR", "ULTRACEMCO", "UNIONBANK", "UNITDSPR", "UNOMINDA", "UPL", "VBL", "VEDL", "VMM", "VOLTAS", "WAAREEENER", "WIPRO", "YESBANK", "ZYDUSLIFE"]);
+function foTag(sym){return FO_SYMBOLS.has((sym||'').toUpperCase())?'<span class="fo-badge">F&amp;O</span>':'';}
+
 function cfgBadge(cfg){
   const cls = cfg?cfg.toLowerCase():'';
   return `<span class="cfg-badge ${cls}">${cfg||'—'}</span>`;
@@ -2643,7 +2649,7 @@ function rowHTML(tab,r,n){
       ?`<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:900;background:linear-gradient(135deg,var(--blue2),var(--cyan2));color:#fff">${bc}x</span>`
       :`<span style="color:var(--text3)">${bc}</span>`;
     return `<tr>
-      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td>
       <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td><td>&#8377;${fN(r.CURRENT_LTP)}</td>
       <td>&#8377;${fN(r.TARGET_PRICE)}</td><td>&#8377;${fN(r.STOP_PRICE)}</td>
@@ -2655,7 +2661,7 @@ function rowHTML(tab,r,n){
   }
   if(tab==='closed'){
     return `<tr>
-      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td><td>${fD(r.EXIT_DATE)}</td>
       <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td><td>&#8377;${fN(r.EXIT_PRICE)}</td>
       <td>${fI(r.TOTAL_QTY)}</td><td>&#8377;${fN(r.TOTAL_INVESTMENT)}</td>
@@ -2673,7 +2679,7 @@ function rowHTML(tab,r,n){
     const bc=parseInt(r.BUY_COUNT||1);
     const bcHtml=bc>1?`<span style="font-weight:800;color:var(--blue2)">${bc}x</span>`:`${bc}`;
     return `<tr>
-      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td>
       <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td>
       <td class="${(parseFloat(r.GAIN_PCT)||0)>=0?'green':'red'}">&#8377;${fN(r.CURRENT_LTP)}</td>
@@ -2690,7 +2696,7 @@ function rowHTML(tab,r,n){
     const bcHtml=bc>1?`<span style="font-weight:800;color:var(--blue2)">${bc}x</span>`:`${bc}`;
     const cardKey=`${r.CONFIG}|${r.SYMBOL}`;
     return `<tr>
-      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td><td>${fD(r.EXIT_DATE)}</td>
       <td>${r.STATUS||'—'}</td>
       <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td><td>&#8377;${fN(r.EXIT_PRICE)}</td>
@@ -2753,7 +2759,7 @@ function renderSignals(rows){
       <td>${start+i+1}</td>
       <td>${date}</td>
       <td>${sigCfgs.length?sigCfgs.map(c=>cfgBadge(c)).join(' '):'—'}</td>
-      <td><strong>${sym}</strong></td>
+      <td><strong>${sym}</strong>${foTag(sym)}</td>
       <td ${pnlColor(chg1d)}>${chg1d>=0?'+':''}${f2(chg1d)}%</td>
       <td>${chg5d!=null?`<span ${chg5d>=0?'class="green"':'class="red"'}>${chg5d>=0?'+':''}${f2(chg5d)}%</span>`:'—'}</td>
       <td>&#8377;${fN(close)}</td>
@@ -2853,7 +2859,7 @@ function renderAvgTrigger(){
     return `<tr>
       <td style="text-align:center;width:32px">${start+i+1}</td>
       <td style="text-align:center;width:44px">${cfgBadge(r.CONFIG)}</td>
-      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.SYMBOL}"><strong>${r.SYMBOL}</strong></td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.SYMBOL}"><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td style="font-size:11px;white-space:nowrap;width:72px">${fD(r.SIGNAL_DATE)}</td>
       <td style="text-align:right;width:76px">&#8377;${fN(avg)}</td>
       <td style="text-align:right;width:76px">&#8377;${fN(ltp)}</td>
@@ -3220,7 +3226,7 @@ function renderSellTrigger(){
     const pnl=parseFloat(r.PROFIT)||0;
     const pct=parseFloat(r.GAIN_PCT)||0;
     return `<tr>
-      <td>${start+i+1}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${start+i+1}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td>
       <td style="text-align:right">&#8377;${fN(avg)}</td>
       <td class="green" style="text-align:right">&#8377;${fN(ltp)}</td>
@@ -3345,7 +3351,7 @@ function renderAvgHistory(){
     return `<tr>
       <td>${start+i+1}</td>
       <td>${cfgBadge(r.CONFIG)}</td>
-      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong>${r.SYMBOL}</strong></td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td style="font-size:12px;white-space:nowrap">${fD(r.SIGNAL_DATE)}</td>
       ${buyCols}
       <td style="text-align:right">&#8377;${fN(r.AVG_BUY_PRICE)}</td>
@@ -3436,7 +3442,7 @@ function renderMarketData(){
     const recStr=chg1d!==null?`${chg1d>=0?'+':''}${chg1d.toFixed(2)}%`:'—';
     const recPct=chg1d;
     return `<tr>
-      <td>${start+i+1}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong></td>
+      <td>${start+i+1}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td>
       <td>₹${fN(r.AVG_BUY_PRICE)}</td>
       <td class="${pct>=0?'green':'red'}">₹${fN(ltp)}</td>
@@ -3540,7 +3546,7 @@ function renderPerformance(){
   const topProfit=[...syms].sort((a,b)=>b.pnl-a.pnl).slice(0,10);
   const topLoss=[...syms].sort((a,b)=>a.pnl-b.pnl).slice(0,10);
   const mkRow=r=>`<tr>
-    <td><strong>${r.sym}</strong></td><td>${r.trades}</td>
+    <td><strong>${r.sym}</strong>${foTag(r.sym)}</td><td>${r.trades}</td>
     <td ${pnlColor(r.pnl)}>₹${fN(r.pnl)}</td>
     <td class="${r.trades>0&&(r.wins/r.trades*100)>=50?'green':'red'}">${r.trades>0?(r.wins/r.trades*100).toFixed(0):'0'}%</td>
   </tr>`;
@@ -3869,7 +3875,7 @@ async function renderMTFOutput() {
     }).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
     return '<tr>' +
       '<td>' + (startIdx+i+1) + '</td>' +
-      '<td><strong>' + r.SYMBOL + '</strong></td>' +
+      '<td><strong>' + r.SYMBOL + '</strong>' + foTag(r.SYMBOL) + '</td>' +
       '<td>' + fD(item.sigDate) + '</td>' +
       '<td>₹' + fN(item.sigPrice) + '</td>' +
       '<td>' + dur + '</td>' +
@@ -4096,7 +4102,7 @@ function _renderPortfolioNow() {
     const cls  = isGreen ? 'green' : 'red';
     return '<tr>' +
       '<td>' + (startIdx+i+1) + '</td>' +
-      '<td><strong>' + (p.symbol||'') + '</strong></td>' +
+      '<td><strong>' + (p.symbol||'') + '</strong>' + foTag(p.symbol||'') + '</td>' +
       '<td>' + fD(p.added_date) + '</td>' +
       '<td>₹' + fN(avg) + '</td>' +
       '<td>' + (p.qty || '—') + '</td>' +
