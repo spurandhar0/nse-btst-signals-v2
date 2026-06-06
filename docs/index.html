@@ -136,9 +136,50 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 .brow .bs{font-size:12px;color:#475569;}
 
 .fo-badge{background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;white-space:nowrap}
+
+/* ── LOGIN GATE ──────────────────────────────────────────────────── */
+#login-gate {
+  position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2a 0%,#1e3a5f 60%,#0f2940 100%);
+  z-index:99999;display:flex;align-items:center;justify-content:center;
+}
+#login-gate .login-box {
+  background:#fff;border-radius:18px;padding:40px 44px 36px;min-width:360px;max-width:420px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;
+}
+#login-gate .login-logo { font-size:28px;font-weight:900;color:#0d1f3c;letter-spacing:-0.5px;margin-bottom:4px; }
+#login-gate .login-sub { font-size:13px;color:#64748b;margin-bottom:28px; }
+#login-gate input {
+  width:100%;box-sizing:border-box;padding:11px 14px;border-radius:9px;
+  border:1.5px solid #e2e8f0;font-size:15px;margin-bottom:14px;transition:border-color .2s;outline:none;
+}
+#login-gate input:focus { border-color:#2563eb; }
+#login-gate .btn-login {
+  width:100%;padding:12px;border:none;border-radius:9px;
+  background:linear-gradient(135deg,#0d1f3c,#2563eb);color:#fff;
+  font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s;
+}
+#login-gate .btn-login:hover { opacity:.9; }
+#login-gate .login-err { color:#dc2626;font-size:13px;margin-top:8px;min-height:18px;font-weight:500; }
+#login-gate .login-footer { margin-top:22px;font-size:11px;color:#94a3b8; }
+
 </style>
 </head>
 <body>
+<!-- ── LOGIN GATE ──────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-box">
+    <div class="login-logo">&#128202; NSE BTST Dashboard</div>
+    <div class="login-sub">Secure access &mdash; enter your credentials</div>
+    <input type="text" id="lg-user" placeholder="Username" autocomplete="username"
+           onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()" />
+    <input type="password" id="lg-pass" placeholder="Password" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter')_doLogin()" />
+    <button class="btn-login" onclick="_doLogin()">Sign In &#8594;</button>
+    <div class="login-err" id="lg-err"></div>
+    <div class="login-footer">NSE BTST Signals &mdash; Private Dashboard</div>
+  </div>
+</div>
+
 
 <header>
   <div class="hdr">
