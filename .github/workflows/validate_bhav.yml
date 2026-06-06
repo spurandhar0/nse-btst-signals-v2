@@ -1,0 +1,78 @@
+name: Validate & Backfill NSE Bhav Data
+
+# ─── PURPOSE ────────────────────────────────────────────────────────────────
+# Every trading day (Mon-Fri, excl NSE holidays) after market close:
+#   1. Download today's bhav copy if not already present
+#   2. Scan ALL trading days from FROM_DATE (default 2025-01-01) to today
+#   3. For each missing day's bhav, auto-download from NSE archives
+#   4. Validate every known symbol has OHLC data for every trading day
+#   5. Fill gaps via NSE historical API, no manual intervention needed
+#
+# FULLY SELF-CONTAINED: uses only GITHUB_TOKEN (built-in, no external PAT).
+# Works forever — no Tasklet, no external tokens, no third-party services.
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # 5:30 PM IST = 12:00 UTC  — runs after NSE closes at 3:30 PM IST
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: 'Validate from date YYYY-MM-DD (default 2025-01-01)'
+        required: false
+        default: '2025-01-01'
+      force_recheck:
+        description: 'Recheck even already-downloaded dates? (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write   # GITHUB_TOKEN can push to THIS repo — no PAT needed
+
+jobs:
+  validate-and-backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120   # generous limit — handles 500+ symbols, years of backfill
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history so we can commit cleanly
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Python ────────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy requests pyarrow openpyxl
+
+      # ── 3. Validate + auto-backfill ──────────────────────────────────────
+      - name: Validate bhav data and fill gaps
+        env:
+          FROM_DATE:      ${{ github.event.inputs.from_date || '2025-01-01' }}
+          FORCE_RECHECK:  ${{ github.event.inputs.force_recheck || 'false' }}
+        run: python src/validate_and_backfill.py
+
+      # ── 4. Rebuild derived layers if anything changed ────────────────────
+      - name: Rebuild derived DB layers (filter / ATH)
+        run: |
+          python src/02_filter_eq.py
+          python src/03_find_ath.py
+
+      # ── 5. Commit gaps-filled data back to THIS repo ─────────────────────
+      - name: Commit validated bhav data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bhav_data/ db/ || true
+          git diff --staged --quiet \
+            && echo "Nothing new — all data already complete ✓" \
+            || git commit -m "auto: bhav validate+backfill $(date +'%Y-%m-%d')"
+          git push origin HEAD:main

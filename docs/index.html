@@ -221,11 +221,11 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <div class="hdr-sep"></div>
       <div class="hdr-title">
         <div class="t1">NSE BTST Signals</div>
-        <div class="t2">DAILY SIGNAL SCANNER &middot; 78 CONFIGS &middot; SIMULATION TRACKER</div>
+        <div class="t2">DAILY SIGNAL SCANNER &middot; 52 CONFIGS &middot; SIMULATION TRACKER</div>
       </div>
     </div>
     <div class="hdr-right">
-      <span class="hdr-badge">&#9679; 06-Jun-2026 12:25 IST</span>
+      <span class="hdr-badge">&#9679; 06-Jun-2026 11:21 IST</span>
       <button class="hdr-btn" onclick="location.reload()">&#8635; Refresh</button>
     </div>
   </div>
@@ -242,7 +242,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 </div>
 
 <div id="liveBanner">
-  &#10003; Last simulation: <strong id="bannerDate">06-Jun-2026 12:25 IST</strong> &nbsp;|&nbsp; Data date: <strong id="bannerDataDate">2026-05-25</strong>
+  &#10003; Last simulation: <strong id="bannerDate">06-Jun-2026 11:21 IST</strong> &nbsp;|&nbsp; Data date: <strong id="bannerDataDate">2026-05-25</strong>
 </div>
 
 <div class="container">
@@ -261,7 +261,13 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 <div class="tabs">
   <div class="tab active"  onclick="showTab('overview',this)">&#9675; Overview</div>
   <div class="tab" onclick="showTab('open',this)">&#9711; Open Positions</div>
+  <div class="tab" onclick="showTab('fno',this)">&#128197; F&amp;O Open</div>
+  <div class="tab" onclick="showTab('fnoclosed',this)">&#10003; F&amp;O Closed</div>
   <div class="tab" onclick="showTab('closed',this)">&#10003; Closed Positions</div>
+  <div class="tab" onclick="showTab('uniopen',this)">&#9670; Uni Open</div>
+  <div class="tab" onclick="showTab('uniclosed',this)">&#9670; Uni Closed</div>
+  <div class="tab" onclick="showTab('unifno',this)">&#9670; Uni F&amp;O Open</div>
+  <div class="tab" onclick="showTab('unifnoclosed',this)">&#9670; Uni F&amp;O Closed</div>
   <div class="tab" onclick="showTab('fe',this)">&#9888; Force Exit</div>
   <div class="tab" onclick="showTab('history',this)">&#9776; Stock History</div>
   <div class="tab" onclick="showTab('ledger',this)">&#9781; Daily Ledger</div>
@@ -335,33 +341,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="ovCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="ovCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="ovCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="ovCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C78',this)">C78</button>
     </div>
 <div id="ov-stats" class="stat-grid"></div>
   <div class="card" style="padding:0 0 8px">
@@ -470,6 +449,193 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   </div>
 </div>
 
+<div id="tab-fno" class="hidden">
+  <div class="tab-badges" id="fno-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">Config:</span>
+    <button class="btn-filter active" onclick="cfgFilter('fno','ALL',this)">All</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C1',this)">C1</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C2',this)">C2</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C3',this)">C3</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C4',this)">C4</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C5',this)">C5</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C6',this)">C6</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C7',this)">C7</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C8',this)">C8</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C9',this)">C9</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C10',this)">C10</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C11',this)">C11</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C12',this)">C12</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C13',this)">C13</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C14',this)">C14</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C15',this)">C15</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C16',this)">C16</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C17',this)">C17</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C18',this)">C18</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C19',this)">C19</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C20',this)">C20</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C21',this)">C21</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C22',this)">C22</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C23',this)">C23</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C24',this)">C24</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C25',this)">C25</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C26',this)">C26</button>
+    <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
+    <button class="btn-filter" onclick="cfgFilter('fno','C27',this)">C27</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C28',this)">C28</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C29',this)">C29</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C30',this)">C30</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C31',this)">C31</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C32',this)">C32</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C33',this)">C33</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C34',this)">C34</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C35',this)">C35</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C36',this)">C36</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C37',this)">C37</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C38',this)">C38</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C39',this)">C39</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C40',this)">C40</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C41',this)">C41</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C42',this)">C42</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C43',this)">C43</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C44',this)">C44</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C45',this)">C45</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C46',this)">C46</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C47',this)">C47</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C48',this)">C48</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C49',this)">C49</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C50',this)">C50</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C51',this)">C51</button>
+    <button class="btn-filter" onclick="cfgFilter('fno','C52',this)">C52</button>
+    <div style="flex:1"></div>
+    <input type="text" id="fno-search" placeholder="🔍 Search symbol..." oninput="renderTab('fno')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('fno')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('fno')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('fno',0)">#</th>
+        <th onclick="srt('fno',1)">CFG</th>
+        <th onclick="srt('fno',2)">SYMBOL</th>
+        <th onclick="srt('fno',3)">BUY DATE</th>
+        <th onclick="srt('fno',4)">AVG BUY &#8377;</th>
+        <th onclick="srt('fno',5)">CURRENT LTP &#8377;</th>
+        <th onclick="srt('fno',6)">TARGET &#8377;</th>
+        <th onclick="srt('fno',7)">STOP &#8377;</th>
+        <th onclick="srt('fno',8)">BUYS</th>
+        <th onclick="srt('fno',9)">QTY</th>
+        <th onclick="srt('fno',10)">INVESTED &#8377;</th>
+        <th onclick="srt('fno',11)">MARKET DAYS</th>
+        <th onclick="srt('fno',12)">UNREAL P&amp;L &#8377;</th>
+        <th onclick="srt('fno',13)">GAIN %</th>
+      </tr></thead>
+      <tbody id="fno-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="fno-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('fno',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('fno',1)">Next &#8250;</button>
+      <select id="fno-pgsize" onchange="renderTab('fno')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
+<div id="tab-fnoclosed" class="hidden">
+  <div class="tab-badges" id="fnoclosed-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">Config:</span>
+    <button class="btn-filter active" onclick="cfgFilter('fnoclosed','ALL',this)">All</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C1',this)">C1</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C2',this)">C2</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C3',this)">C3</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C4',this)">C4</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C5',this)">C5</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C6',this)">C6</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C7',this)">C7</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C8',this)">C8</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C9',this)">C9</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C10',this)">C10</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C11',this)">C11</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C12',this)">C12</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C13',this)">C13</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C14',this)">C14</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C15',this)">C15</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C16',this)">C16</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C17',this)">C17</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C18',this)">C18</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C19',this)">C19</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C20',this)">C20</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C21',this)">C21</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C22',this)">C22</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C23',this)">C23</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C24',this)">C24</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C25',this)">C25</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C26',this)">C26</button>
+    <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C27',this)">C27</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C28',this)">C28</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C29',this)">C29</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C30',this)">C30</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C31',this)">C31</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C32',this)">C32</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C33',this)">C33</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C34',this)">C34</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C35',this)">C35</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C36',this)">C36</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C37',this)">C37</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C38',this)">C38</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C39',this)">C39</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C40',this)">C40</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C41',this)">C41</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C42',this)">C42</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C43',this)">C43</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C44',this)">C44</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C45',this)">C45</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C46',this)">C46</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C47',this)">C47</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C48',this)">C48</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C49',this)">C49</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C50',this)">C50</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C51',this)">C51</button>
+    <button class="btn-filter" onclick="cfgFilter('fnoclosed','C52',this)">C52</button>
+    <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
+    <span class="slbl">Result:</span>
+    <button class="btn-filter active" id="fnoclosed-res-ALL" onclick="resFilter('fnoclosed','ALL',this)">All</button>
+    <button class="btn-filter" id="fnoclosed-res-P" onclick="resFilter('fnoclosed','P',this)">Profit</button>
+    <button class="btn-filter" id="fnoclosed-res-L" onclick="resFilter('fnoclosed','L',this)">Loss</button>
+    <button class="btn-filter" id="fnoclosed-res-FE" onclick="resFilter('fnoclosed','FE',this)">FE Only</button>
+    <div style="flex:1"></div>
+    <input type="text" id="fnoclosed-search" placeholder="&#128269; Search symbol..." oninput="renderTab('fnoclosed')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('fnoclosed')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('fnoclosed')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('fnoclosed',0)">#</th>
+        <th onclick="srt('fnoclosed',1)">CFG</th>
+        <th onclick="srt('fnoclosed',2)">SYMBOL</th>
+        <th onclick="srt('fnoclosed',3)">BUY DATE</th>
+        <th onclick="srt('fnoclosed',4)">EXIT DATE</th>
+        <th onclick="srt('fnoclosed',5)">AVG BUY &#8377;</th>
+        <th onclick="srt('fnoclosed',6)">EXIT PRICE &#8377;</th>
+        <th onclick="srt('fnoclosed',7)">QTY</th>
+        <th onclick="srt('fnoclosed',8)">INVESTED &#8377;</th>
+        <th onclick="srt('fnoclosed',9)">P&amp;L &#8377;</th>
+        <th onclick="srt('fnoclosed',10)">GAIN %</th>
+        <th onclick="srt('fnoclosed',11)">MARKET DAYS</th>
+        <th onclick="srt('fnoclosed',12)">RESULT</th>
+      </tr></thead>
+      <tbody id="fnoclosed-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="fnoclosed-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('fnoclosed',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('fnoclosed',1)">Next &#8250;</button>
+      <select id="fnoclosed-pgsize" onchange="renderTab('fnoclosed')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
 <div id="tab-closed" class="hidden">
   <div class="tab-badges" id="closed-badges"></div>
   <div class="cstrip">
@@ -565,6 +731,168 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
   </div>
 </div>
+<div id="tab-uniopen" class="hidden">
+  <div class="tab-badges" id="uniopen-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">&#9670; Unique Open Positions — one row per symbol</span>
+    <div style="flex:1"></div>
+    <button class="btn-filter active" id="uniopen-mode-min" onclick="setUniMode('uniopen','min',this)">&#9670; Min Avg</button>
+    <button class="btn-filter" id="uniopen-mode-max" onclick="setUniMode('uniopen','max',this)">&#9670; Max Avg</button>
+    <input type="text" id="uniopen-search" placeholder="🔍 Search symbol..." oninput="renderTab('uniopen')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('uniopen')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('uniopen')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('uniopen',0)">#</th>
+        <th onclick="srt('uniopen',1)">CFG</th>
+        <th onclick="srt('uniopen',2)">SYMBOL</th>
+        <th onclick="srt('uniopen',3)">BUY DATE</th>
+        <th onclick="srt('uniopen',4)">AVG BUY &#8377;</th>
+        <th onclick="srt('uniopen',5)">CURRENT LTP &#8377;</th>
+        <th onclick="srt('uniopen',6)">TARGET &#8377;</th>
+        <th onclick="srt('uniopen',7)">STOP &#8377;</th>
+        <th onclick="srt('uniopen',8)">BUYS</th>
+        <th onclick="srt('uniopen',9)">QTY</th>
+        <th onclick="srt('uniopen',10)">INVESTED &#8377;</th>
+        <th onclick="srt('uniopen',11)">MARKET DAYS</th>
+        <th onclick="srt('uniopen',12)">UNREAL P&amp;L &#8377;</th>
+        <th onclick="srt('uniopen',13)">GAIN %</th>
+      </tr></thead>
+      <tbody id="uniopen-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="uniopen-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('uniopen',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('uniopen',1)">Next &#8250;</button>
+      <select id="uniopen-pgsize" onchange="renderTab('uniopen')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
+<div id="tab-uniclosed" class="hidden">
+  <div class="tab-badges" id="uniclosed-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">&#9670; Unique Closed Positions — one row per symbol</span>
+    <div style="flex:1"></div>
+    <button class="btn-filter" id="uniclosed-mode-min" onclick="setUniMode('uniclosed','min',this)">&#9670; Min Avg</button>
+    <button class="btn-filter active" id="uniclosed-mode-max" onclick="setUniMode('uniclosed','max',this)">&#9670; Max Avg</button>
+    <button class="btn-filter active" id="uni-closed-ALL" onclick="uniClosedFilter('ALL',this)">All</button>
+    <button class="btn-filter" id="uni-closed-P" onclick="uniClosedFilter('P',this)">Profit</button>
+    <button class="btn-filter" id="uni-closed-L" onclick="uniClosedFilter('L',this)">Loss</button>
+    <button class="btn-filter" id="uni-closed-FE" onclick="uniClosedFilter('FE',this)">FE</button>
+    <input type="text" id="uniclosed-search" placeholder="🔍 Search symbol..." oninput="renderTab('uniclosed')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('uniclosed')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('uniclosed')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('uniclosed',0)">#</th>
+        <th onclick="srt('uniclosed',1)">CFG</th>
+        <th onclick="srt('uniclosed',2)">SYMBOL</th>
+        <th onclick="srt('uniclosed',3)">BUY DATE</th>
+        <th onclick="srt('uniclosed',4)">EXIT DATE</th>
+        <th onclick="srt('uniclosed',5)">AVG BUY &#8377;</th>
+        <th onclick="srt('uniclosed',6)">EXIT &#8377;</th>
+        <th onclick="srt('uniclosed',7)">QTY</th>
+        <th onclick="srt('uniclosed',8)">INVESTED &#8377;</th>
+        <th onclick="srt('uniclosed',9)">P&amp;L &#8377;</th>
+        <th onclick="srt('uniclosed',10)">GAIN %</th>
+        <th onclick="srt('uniclosed',11)">DAYS</th>
+        <th onclick="srt('uniclosed',12)">RESULT</th>
+      </tr></thead>
+      <tbody id="uniclosed-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="uniclosed-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('uniclosed',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('uniclosed',1)">Next &#8250;</button>
+      <select id="uniclosed-pgsize" onchange="renderTab('uniclosed')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
+<div id="tab-unifno" class="hidden">
+  <div class="tab-badges" id="unifno-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">&#9670; Unique F&amp;O Open — one row per F&amp;O symbol</span>
+    <div style="flex:1"></div>
+    <button class="btn-filter active" id="unifno-mode-min" onclick="setUniMode('unifno','min',this)">&#9670; Min Avg</button>
+    <button class="btn-filter" id="unifno-mode-max" onclick="setUniMode('unifno','max',this)">&#9670; Max Avg</button>
+    <input type="text" id="unifno-search" placeholder="🔍 Search symbol..." oninput="renderTab('unifno')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('unifno')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('unifno')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('unifno',0)">#</th>
+        <th onclick="srt('unifno',1)">CFG</th>
+        <th onclick="srt('unifno',2)">SYMBOL</th>
+        <th onclick="srt('unifno',3)">BUY DATE</th>
+        <th onclick="srt('unifno',4)">AVG BUY &#8377;</th>
+        <th onclick="srt('unifno',5)">CURRENT LTP &#8377;</th>
+        <th onclick="srt('unifno',6)">TARGET &#8377;</th>
+        <th onclick="srt('unifno',7)">STOP &#8377;</th>
+        <th onclick="srt('unifno',8)">BUYS</th>
+        <th onclick="srt('unifno',9)">QTY</th>
+        <th onclick="srt('unifno',10)">INVESTED &#8377;</th>
+        <th onclick="srt('unifno',11)">MARKET DAYS</th>
+        <th onclick="srt('unifno',12)">UNREAL P&amp;L &#8377;</th>
+        <th onclick="srt('unifno',13)">GAIN %</th>
+      </tr></thead>
+      <tbody id="unifno-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="unifno-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('unifno',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('unifno',1)">Next &#8250;</button>
+      <select id="unifno-pgsize" onchange="renderTab('unifno')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
+<div id="tab-unifnoclosed" class="hidden">
+  <div class="tab-badges" id="unifnoclosed-badges"></div>
+  <div class="cstrip">
+    <span class="slbl">&#9670; Unique F&amp;O Closed — one row per F&amp;O symbol</span>
+    <div style="flex:1"></div>
+    <button class="btn-filter" id="unifnoclosed-mode-min" onclick="setUniMode('unifnoclosed','min',this)">&#9670; Min Avg</button>
+    <button class="btn-filter active" id="unifnoclosed-mode-max" onclick="setUniMode('unifnoclosed','max',this)">&#9670; Max Avg</button>
+    <button class="btn-filter active" id="uni-fnoclosed-ALL" onclick="uniFnoClosedFilter('ALL',this)">All</button>
+    <button class="btn-filter" id="uni-fnoclosed-P" onclick="uniFnoClosedFilter('P',this)">Profit</button>
+    <button class="btn-filter" id="uni-fnoclosed-L" onclick="uniFnoClosedFilter('L',this)">Loss</button>
+    <button class="btn-filter" id="uni-fnoclosed-FE" onclick="uniFnoClosedFilter('FE',this)">FE</button>
+    <input type="text" id="unifnoclosed-search" placeholder="🔍 Search symbol..." oninput="renderTab('unifnoclosed')" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">
+    <button class="btn-green btn-sm" onclick="exportTab('unifnoclosed')">&#8595; Excel</button>
+    <button class="btn-teal btn-sm" onclick="exportCSVTab('unifnoclosed')">&#8595; CSV</button>
+  </div>
+  <div class="card" style="padding:0 0 8px">
+    <div class="table-area">
+      <table><thead><tr>
+        <th onclick="srt('unifnoclosed',0)">#</th>
+        <th onclick="srt('unifnoclosed',1)">CFG</th>
+        <th onclick="srt('unifnoclosed',2)">SYMBOL</th>
+        <th onclick="srt('unifnoclosed',3)">BUY DATE</th>
+        <th onclick="srt('unifnoclosed',4)">EXIT DATE</th>
+        <th onclick="srt('unifnoclosed',5)">AVG BUY &#8377;</th>
+        <th onclick="srt('unifnoclosed',6)">EXIT &#8377;</th>
+        <th onclick="srt('unifnoclosed',7)">QTY</th>
+        <th onclick="srt('unifnoclosed',8)">INVESTED &#8377;</th>
+        <th onclick="srt('unifnoclosed',9)">P&amp;L &#8377;</th>
+        <th onclick="srt('unifnoclosed',10)">GAIN %</th>
+        <th onclick="srt('unifnoclosed',11)">DAYS</th>
+        <th onclick="srt('unifnoclosed',12)">RESULT</th>
+      </tr></thead>
+      <tbody id="unifnoclosed-body"></tbody></table>
+    </div>
+    <div class="pager"><span class="info" id="unifnoclosed-info"></span><div style="flex:1"></div>
+      <button class="btn-sm btn-outline" onclick="pg('unifnoclosed',-1)">&#8249; Prev</button>
+      <button class="btn-sm btn-outline" onclick="pg('unifnoclosed',1)">Next &#8250;</button>
+      <select id="unifnoclosed-pgsize" onchange="renderTab('unifnoclosed')"><option value="25">25</option><option value="100">100</option><option value="9999">All</option></select>
+    </div>
+  </div>
+</div>
+
 
 <div id="tab-fe" class="hidden">
   <div class="tab-badges" id="fe-badges"></div>
@@ -930,107 +1258,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <button class="btn-green btn-sm" onclick="exportTab('signals')">&#8595; Excel</button>
     <button class="btn-teal btn-sm" onclick="exportCSVTab('signals')">&#8595; CSV</button>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-    <span class="slbl">Config:</span>
-    <button class="btn-filter active" onclick="sigCfgFilter('ALL',this)">All</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C1',this)">C1</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C2',this)">C2</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C3',this)">C3</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C4',this)">C4</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C5',this)">C5</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C6',this)">C6</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C7',this)">C7</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C8',this)">C8</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C9',this)">C9</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C10',this)">C10</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C11',this)">C11</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C12',this)">C12</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C13',this)">C13</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C14',this)">C14</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C15',this)">C15</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C16',this)">C16</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C17',this)">C17</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C18',this)">C18</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C19',this)">C19</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C20',this)">C20</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C21',this)">C21</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C22',this)">C22</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C23',this)">C23</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C24',this)">C24</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C25',this)">C25</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C26',this)">C26</button>
-    <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-    <button class="btn-filter" onclick="sigCfgFilter('C27',this)">C27</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C28',this)">C28</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C29',this)">C29</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C30',this)">C30</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C31',this)">C31</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C32',this)">C32</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C33',this)">C33</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C34',this)">C34</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C35',this)">C35</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C36',this)">C36</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C37',this)">C37</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C38',this)">C38</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C39',this)">C39</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C40',this)">C40</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C41',this)">C41</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C42',this)">C42</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C43',this)">C43</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C44',this)">C44</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C45',this)">C45</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C46',this)">C46</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C47',this)">C47</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C48',this)">C48</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C49',this)">C49</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C50',this)">C50</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C51',this)">C51</button>
-    <button class="btn-filter" onclick="sigCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="sigCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="sigCfgFilter('C78',this)">C78</button>
+    <button class="btn-cfg-open" onclick="openConfigModal()">&#9881; Configs &nbsp;<span class="cfg-sel-badge" style="font-weight:400;opacity:.85">All</span></button>
   </div>
   <div class="card" style="padding:0 0 8px">
     <div class="table-area">
       <table><thead><tr>
-        <th onclick="srt('signals',0)">#</th>
-        <th onclick="srt('signals',1)" style="white-space:nowrap;min-width:88px">DATE</th>
-        <th onclick="srt('signals',2)">CFG</th>
-        <th onclick="srt('signals',10)">STOCK</th>
-        <th onclick="srt('signals',3)">1D %</th>
-        <th onclick="srt('signals',4)">5D %</th>
-        <th onclick="srt('signals',5)">BUY PRICE &#8377;</th>
-        <th onclick="srt('signals',6)">LTP &#8377;</th>
-        <th onclick="srt('signals',7)">TARGET &#8377;</th>
-        <th onclick="srt('signals',8)">SL &#8377;</th>
-        <th onclick="srt('signals',9)">STATUS</th>
+        <th>#</th>
+        <th>DATE</th>
+        <th>CONFIGS</th>
+        <th>SYMBOL</th>
+        <th>1D %</th>
+        <th>5D %</th>
+        <th>BUY PRICE &#8377;</th>
+        <th>LTP &#8377;</th>
+        <th>TARGET &#8377;</th>
+        <th>STOP LOSS &#8377;</th>
+        <th>STATUS</th>
       </tr></thead>
       <tbody id="signals-body"></tbody></table>
     </div>
-    <div class="pager"><span class="info" id="signals-info"></span><div style="flex:1"></div>
+    <div class="pager">
+      <span class="info" id="signals-info"></span><div style="flex:1"></div>
       <button class="btn-sm btn-outline" onclick="pg('signals',-1)">&#8249; Prev</button>
       <button class="btn-sm btn-outline" onclick="pg('signals',1)">Next &#8250;</button>
       <select id="signals-pgsize" onchange="renderTab('signals')"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="9999">All</option></select>
@@ -1038,420 +1286,60 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   </div>
 </div>
 
+<div id="cfg-select-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border-radius:14px;padding:28px 32px;max-width:660px;width:96%;box-shadow:0 8px 40px rgba(0,0,0,.5);position:relative;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
+      <div>
+        <h3 style="margin:0;font-size:17px;color:var(--navy);font-weight:700;">&#9881; Select Configurations</h3>
+        <div id="cfg-sel-count" style="font-size:13px;color:var(--text3);margin-top:3px;"></div>
+      </div>
+      <button onclick="closeCfgSelectModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1;padding:4px 8px;">&#x2715;</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="cfgSelAll()" style="padding:6px 18px;border-radius:8px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Select All</button>
+      <button onclick="cfgSelClear()" style="padding:6px 18px;border-radius:8px;border:2px solid #ef4444;background:transparent;color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;">Clear All</button>
+    </div>
+    <div id="cfg-sel-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;max-height:240px;overflow-y:auto;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);padding-top:16px;">
+      <button onclick="closeCfgSelectModal()" style="padding:8px 22px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
+      <button onclick="applyCfgSelect()" style="padding:8px 22px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Apply &amp; Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="tab-configs" class="hidden">
-  <div class="card">
-    <h3 style="color:var(--navy);margin-bottom:16px">&#9881; Parameter Configurations</h3>
-    <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
-      <button class="btn-filter active" id="cfgtab-ALL" onclick="cfgTabFilter('ALL',this)">All</button>
-      <button class="btn-filter" id="cfgtab-C1" onclick="cfgTabFilter('C1',this)">C1</button><button class="btn-filter" id="cfgtab-C2" onclick="cfgTabFilter('C2',this)">C2</button><button class="btn-filter" id="cfgtab-C3" onclick="cfgTabFilter('C3',this)">C3</button><button class="btn-filter" id="cfgtab-C4" onclick="cfgTabFilter('C4',this)">C4</button><button class="btn-filter" id="cfgtab-C5" onclick="cfgTabFilter('C5',this)">C5</button><button class="btn-filter" id="cfgtab-C6" onclick="cfgTabFilter('C6',this)">C6</button><button class="btn-filter" id="cfgtab-C7" onclick="cfgTabFilter('C7',this)">C7</button><button class="btn-filter" id="cfgtab-C8" onclick="cfgTabFilter('C8',this)">C8</button><button class="btn-filter" id="cfgtab-C9" onclick="cfgTabFilter('C9',this)">C9</button><button class="btn-filter" id="cfgtab-C10" onclick="cfgTabFilter('C10',this)">C10</button><button class="btn-filter" id="cfgtab-C11" onclick="cfgTabFilter('C11',this)">C11</button><button class="btn-filter" id="cfgtab-C12" onclick="cfgTabFilter('C12',this)">C12</button><button class="btn-filter" id="cfgtab-C13" onclick="cfgTabFilter('C13',this)">C13</button><button class="btn-filter" id="cfgtab-C14" onclick="cfgTabFilter('C14',this)">C14</button><button class="btn-filter" id="cfgtab-C15" onclick="cfgTabFilter('C15',this)">C15</button><button class="btn-filter" id="cfgtab-C16" onclick="cfgTabFilter('C16',this)">C16</button><button class="btn-filter" id="cfgtab-C17" onclick="cfgTabFilter('C17',this)">C17</button><button class="btn-filter" id="cfgtab-C18" onclick="cfgTabFilter('C18',this)">C18</button><button class="btn-filter" id="cfgtab-C19" onclick="cfgTabFilter('C19',this)">C19</button><button class="btn-filter" id="cfgtab-C20" onclick="cfgTabFilter('C20',this)">C20</button><button class="btn-filter" id="cfgtab-C21" onclick="cfgTabFilter('C21',this)">C21</button><button class="btn-filter" id="cfgtab-C22" onclick="cfgTabFilter('C22',this)">C22</button><button class="btn-filter" id="cfgtab-C23" onclick="cfgTabFilter('C23',this)">C23</button><button class="btn-filter" id="cfgtab-C24" onclick="cfgTabFilter('C24',this)">C24</button><button class="btn-filter" id="cfgtab-C25" onclick="cfgTabFilter('C25',this)">C25</button><button class="btn-filter" id="cfgtab-C26" onclick="cfgTabFilter('C26',this)">C26</button><div style="flex-basis:100%;height:0;margin:0;padding:0"></div><button class="btn-filter" id="cfgtab-C27" onclick="cfgTabFilter('C27',this)">C27</button><button class="btn-filter" id="cfgtab-C28" onclick="cfgTabFilter('C28',this)">C28</button><button class="btn-filter" id="cfgtab-C29" onclick="cfgTabFilter('C29',this)">C29</button><button class="btn-filter" id="cfgtab-C30" onclick="cfgTabFilter('C30',this)">C30</button><button class="btn-filter" id="cfgtab-C31" onclick="cfgTabFilter('C31',this)">C31</button><button class="btn-filter" id="cfgtab-C32" onclick="cfgTabFilter('C32',this)">C32</button><button class="btn-filter" id="cfgtab-C33" onclick="cfgTabFilter('C33',this)">C33</button><button class="btn-filter" id="cfgtab-C34" onclick="cfgTabFilter('C34',this)">C34</button><button class="btn-filter" id="cfgtab-C35" onclick="cfgTabFilter('C35',this)">C35</button><button class="btn-filter" id="cfgtab-C36" onclick="cfgTabFilter('C36',this)">C36</button><button class="btn-filter" id="cfgtab-C37" onclick="cfgTabFilter('C37',this)">C37</button><button class="btn-filter" id="cfgtab-C38" onclick="cfgTabFilter('C38',this)">C38</button><button class="btn-filter" id="cfgtab-C39" onclick="cfgTabFilter('C39',this)">C39</button><button class="btn-filter" id="cfgtab-C40" onclick="cfgTabFilter('C40',this)">C40</button><button class="btn-filter" id="cfgtab-C41" onclick="cfgTabFilter('C41',this)">C41</button><button class="btn-filter" id="cfgtab-C42" onclick="cfgTabFilter('C42',this)">C42</button><button class="btn-filter" id="cfgtab-C43" onclick="cfgTabFilter('C43',this)">C43</button><button class="btn-filter" id="cfgtab-C44" onclick="cfgTabFilter('C44',this)">C44</button><button class="btn-filter" id="cfgtab-C45" onclick="cfgTabFilter('C45',this)">C45</button><button class="btn-filter" id="cfgtab-C46" onclick="cfgTabFilter('C46',this)">C46</button><button class="btn-filter" id="cfgtab-C47" onclick="cfgTabFilter('C47',this)">C47</button><button class="btn-filter" id="cfgtab-C48" onclick="cfgTabFilter('C48',this)">C48</button><button class="btn-filter" id="cfgtab-C49" onclick="cfgTabFilter('C49',this)">C49</button><button class="btn-filter" id="cfgtab-C50" onclick="cfgTabFilter('C50',this)">C50</button><button class="btn-filter" id="cfgtab-C51" onclick="cfgTabFilter('C51',this)">C51</button><button class="btn-filter" id="cfgtab-C52" onclick="cfgTabFilter('C52',this)">C52</button><div style="flex-basis:100%;height:0;margin:0;padding:0"></div><button class="btn-filter" id="cfgtab-C53" onclick="cfgTabFilter('C53',this)">C53</button><button class="btn-filter" id="cfgtab-C54" onclick="cfgTabFilter('C54',this)">C54</button><button class="btn-filter" id="cfgtab-C55" onclick="cfgTabFilter('C55',this)">C55</button><button class="btn-filter" id="cfgtab-C56" onclick="cfgTabFilter('C56',this)">C56</button><button class="btn-filter" id="cfgtab-C57" onclick="cfgTabFilter('C57',this)">C57</button><button class="btn-filter" id="cfgtab-C58" onclick="cfgTabFilter('C58',this)">C58</button><button class="btn-filter" id="cfgtab-C59" onclick="cfgTabFilter('C59',this)">C59</button><button class="btn-filter" id="cfgtab-C60" onclick="cfgTabFilter('C60',this)">C60</button><button class="btn-filter" id="cfgtab-C61" onclick="cfgTabFilter('C61',this)">C61</button><button class="btn-filter" id="cfgtab-C62" onclick="cfgTabFilter('C62',this)">C62</button><button class="btn-filter" id="cfgtab-C63" onclick="cfgTabFilter('C63',this)">C63</button><button class="btn-filter" id="cfgtab-C64" onclick="cfgTabFilter('C64',this)">C64</button><button class="btn-filter" id="cfgtab-C65" onclick="cfgTabFilter('C65',this)">C65</button><button class="btn-filter" id="cfgtab-C66" onclick="cfgTabFilter('C66',this)">C66</button><button class="btn-filter" id="cfgtab-C67" onclick="cfgTabFilter('C67',this)">C67</button><button class="btn-filter" id="cfgtab-C68" onclick="cfgTabFilter('C68',this)">C68</button><button class="btn-filter" id="cfgtab-C69" onclick="cfgTabFilter('C69',this)">C69</button><button class="btn-filter" id="cfgtab-C70" onclick="cfgTabFilter('C70',this)">C70</button><button class="btn-filter" id="cfgtab-C71" onclick="cfgTabFilter('C71',this)">C71</button><button class="btn-filter" id="cfgtab-C72" onclick="cfgTabFilter('C72',this)">C72</button><button class="btn-filter" id="cfgtab-C73" onclick="cfgTabFilter('C73',this)">C73</button><button class="btn-filter" id="cfgtab-C74" onclick="cfgTabFilter('C74',this)">C74</button><button class="btn-filter" id="cfgtab-C75" onclick="cfgTabFilter('C75',this)">C75</button><button class="btn-filter" id="cfgtab-C76" onclick="cfgTabFilter('C76',this)">C76</button><button class="btn-filter" id="cfgtab-C77" onclick="cfgTabFilter('C77',this)">C77</button><button class="btn-filter" id="cfgtab-C78" onclick="cfgTabFilter('C78',this)">C78</button>
-    </div>
-    <div class="table-area">
-      <table class="ov-table"><thead><tr>
-        <th>CONFIG</th><th>DAYS BACK</th><th>PCT MIN</th><th>PCT MAX</th>
-        <th>ATH MIN</th><th>ATH MAX</th><th>MAX BUYS</th><th>BUY DROP</th>
-        <th>TARGET</th><th>STOP LOSS</th><th>MAX DURATION</th>
-      </tr></thead>
-      <tbody><tr>
-          <td><span class="cfg-badge">C1</span></td>
-          <td>5</td><td>-0.1</td>
-          <td>-0.03</td><td>-0.6</td>
-          <td>-0.3</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C2</span></td>
-          <td>5</td><td>-0.1</td>
-          <td>-0.02</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C3</span></td>
-          <td>5</td><td>-0.1</td>
-          <td>-0.02</td><td>-0.55</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C4</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.03</td><td>-0.6</td>
-          <td>-0.3</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C5</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.02</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C6</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.02</td><td>-0.55</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C7</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.02</td><td>-0.5</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C8</span></td>
-          <td>5</td><td>-0.08</td>
-          <td>-0.03</td><td>-0.6</td>
-          <td>-0.3</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C9</span></td>
-          <td>5</td><td>-0.06</td>
-          <td>-0.04</td><td>-0.4</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C10</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C11</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C12</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C13</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C14</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.5</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C15</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.45</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C16</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.45</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C17</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C18</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C19</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C20</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.45</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C21</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.45</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C22</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C23</span></td>
-          <td>5</td><td>-0.08</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C24</span></td>
-          <td>5</td><td>-0.1</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C25</span></td>
-          <td>5</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C26</span></td>
-          <td>5</td><td>-0.08</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.3</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr><tr>
-          <td><span class="cfg-badge">C27</span></td>
-          <td>5</td><td>-0.06</td>
-          <td>-0.04</td><td>-0.4</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C28</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C29</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C30</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C31</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C32</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C33</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C34</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C35</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C36</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C37</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C38</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C39</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C40</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C41</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C42</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C43</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.05</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C44</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C45</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.6</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C46</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.45</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C47</span></td>
-          <td>10</td><td>-0.09</td>
-          <td>-0.04</td><td>-0.4</td>
-          <td>-0.35</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C48</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>2</td>
-          <td>0.15</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C49</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.15</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C50</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.6</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.15</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C51</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.4</td><td>3</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-<tr>
-          <td><span class="cfg-badge">C52</span></td>
-          <td>10</td><td>-0.1</td>
-          <td>-0.05</td><td>-0.55</td>
-          <td>-0.4</td><td>4</td>
-          <td>0.1</td><td>0.1</td>
-          <td>0.25</td><td>40</td>
-        </tr>
-      </tbody></table>
-    </div>
-    <div style="margin-top:20px;padding:16px;background:#f8faff;border-radius:10px;border:1.5px solid #c7d7fe;font-size:13px;color:var(--text2);line-height:1.8">
-      <strong>DAYS BACK:</strong> Look-back window for N-day low &nbsp;&bull;&nbsp;
-      <strong>PCT MIN/MAX:</strong> % change from N-day low range &nbsp;&bull;&nbsp;
-      <strong>ATH MIN/MAX:</strong> % from All-Time-High range<br>
-      <strong>MAX BUYS:</strong> Max averaging positions &nbsp;&bull;&nbsp;
-      <strong>BUY DROP:</strong> Drop % to trigger next buy &nbsp;&bull;&nbsp;
-      <strong>TARGET/SL:</strong> Exit thresholds &nbsp;&bull;&nbsp;
-      <strong>MAX DURATION:</strong> Max holding days
-    </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px 0;">
+    <button id="cfg-select-open-btn" onclick="buildCfgSelGrid();openCfgSelectModal();" style="padding:8px 18px;border-radius:8px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">&#9881; Configurations (loading...)</button>
+    <label style="font-size:13px;color:var(--text2);">Rows per page:
+      <select id="configs-pgsize" onchange="renderConfigsPage()" style="margin-left:4px;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text1);font-size:13px;">
+        <option value="10">10</option>
+        <option value="25" selected>25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="999999">All</option>
+      </select>
+    </label>
+    <button class="btn-filter" id="configs-prev" onclick="configsChangePage(-1)" disabled>&#8592; Prev</button>
+    <span id="configs-page-info" style="font-size:13px;color:var(--text2);min-width:160px;text-align:center;">Page 1</span>
+    <button class="btn-filter" id="configs-next" onclick="configsChangePage(1)">Next &#8594;</button>
+  </div>
+  <div class="table-area">
+    <table id="cfg-params-table" class="ov-table"><thead><tr>
+      <th>CONFIG</th><th>DAYS BACK</th><th>PCT MIN</th><th>PCT MAX</th>
+      <th>ATH MIN</th><th>ATH MAX</th><th>MAX BUYS</th><th>BUY DROP</th>
+      <th>TARGET</th><th>STOP LOSS</th><th>MAX DURATION</th>
+    </tr></thead>
+    <tbody id="cfg-params-body"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:20px;padding:16px;background:#f8faff;border-radius:10px;border:1.5px solid #c7d7fe;font-size:13px;color:var(--text2);line-height:1.8">
+    <strong>DAYS BACK:</strong> Look-back window for N-day low &nbsp;&bull;&nbsp;
+    <strong>PCT MIN/MAX:</strong> % change from N-day low range &nbsp;&bull;&nbsp;
+    <strong>ATH MIN/MAX:</strong> % from All-Time-High range<br>
+    <strong>MAX BUYS:</strong> Max averaging positions &nbsp;&bull;&nbsp;
+    <strong>BUY DROP:</strong> Drop % to trigger next buy &nbsp;&bull;&nbsp;
+    <strong>TARGET/SL:</strong> Exit thresholds &nbsp;&bull;&nbsp;
+    <strong>MAX DURATION:</strong> Max holding days
   </div>
 </div>
 
@@ -1533,33 +1421,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="avgTrigCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="avgTrigCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="avgTrigCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C78',this)">C78</button>
     </div>
     <div id="avgtrigger-badges" class="tab-badges"></div>
     <div class="table-area">
@@ -1648,33 +1509,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="sellTrigCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="sellTrigCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="sellTrigCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C78',this)">C78</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">  <div id="selltrigger-badges" class="tab-badges" style="flex:1;min-width:0;"></div>  <input id="selltrig-search" type="text" placeholder="🔍 Search symbol..." oninput="renderSellTrigger()" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">  <button class="btn-sm btn-green" onclick="exportTabCSV('selltrigger')">Export CSV</button></div>
     <div class="table-area">
@@ -1754,33 +1588,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="avgHistCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="avgHistCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="avgHistCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C78',this)">C78</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
       <div id="avghistory-badges" class="tab-badges" style="flex:1;min-width:0;"></div>
@@ -1871,33 +1678,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="mdCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="mdCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="mdCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="mdCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C78',this)">C78</button>
     </div>
     <div id="marketdata-badges" class="tab-badges"></div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
@@ -1983,33 +1763,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <button class="btn-filter" onclick="perfCfgFilter('C50',this)">C50</button>
       <button class="btn-filter" onclick="perfCfgFilter('C51',this)">C51</button>
       <button class="btn-filter" onclick="perfCfgFilter('C52',this)">C52</button>
-      <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-      <button class="btn-filter" onclick="perfCfgFilter('C53',this)">C53</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C54',this)">C54</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C55',this)">C55</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C56',this)">C56</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C57',this)">C57</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C58',this)">C58</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C59',this)">C59</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C60',this)">C60</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C61',this)">C61</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C62',this)">C62</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C63',this)">C63</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C64',this)">C64</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C65',this)">C65</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C66',this)">C66</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C67',this)">C67</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C68',this)">C68</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C69',this)">C69</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C70',this)">C70</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C71',this)">C71</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C72',this)">C72</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C73',this)">C73</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C74',this)">C74</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C75',this)">C75</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C76',this)">C76</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C77',this)">C77</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C78',this)">C78</button>
     </div>
     <div id="perf-hero" class="perf-hero"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;" class="perf-panels">
@@ -2100,6 +1853,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
         <input type="number" id="mtf-tgt-input" value="5" min="1" max="100" step="0.5"
                style="width:65px;padding:5px 8px;font-size:13px;border:1px solid var(--border);border-radius:6px;"
                onchange="mtfTgtChange()">
+        <button class="btn-sm btn-teal" onclick="exportMTFExcel()">&#8595; Excel</button>
         <button class="btn-sm btn-green" onclick="exportMTFCSV()">&#8595; CSV</button>
       </div>
     </div>
@@ -2342,9 +2096,9 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 // ─── DATA — loaded asynchronously to keep index.html small ────────────────────
 // SIGNALS_RAW, NIFTY_DATA, CONFIGS_DEF are small enough to inline safely.
 // ALL_ROWS and TRADE_OHLC are fetched from separate JSON files at runtime.
-const SIGNALS_RAW = [{"SYMBOL": "DSSL", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "1288.7", "PREV_CLOSE": "1356.5", "ATH_PRICE": "1924.8", "MIN_5D_LOW": "1356.5", "PCT_FROM_LOW": "-5.0", "PCT_FROM_ATH": "-33.05", "PCT_1D_CHANGE": "-5.0", "CONFIGS_MATCHED": "C1,C2,C3,C9,C11,C12,C19,C20,C26,C27,C28,C35,C38,C42,C46,C47,C48,C49,C50,C51,C52,C53,C55,C57,C58,C59,C61,C63,C64,C65,C66,C68,C69,C70,C72,C73,C74,C76,C77", "CONFIG_COUNT": "39"}, {"SYMBOL": "EXICOM", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "133.85", "PREV_CLOSE": "144.98", "ATH_PRICE": "275.71", "MIN_5D_LOW": "142.89", "PCT_FROM_LOW": "-6.33", "PCT_FROM_ATH": "-51.45", "PCT_1D_CHANGE": "-7.68", "CONFIGS_MATCHED": "C1,C2,C4,C5,C6,C9,C10,C11,C13,C14,C15,C18,C19,C21,C22,C23,C26,C27,C29,C30,C31,C38,C39,C40,C41,C42,C43,C44,C45,C46,C54,C56,C60,C64,C68,C72,C75", "CONFIG_COUNT": "37"}, {"SYMBOL": "MEDICAMEQ", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "245.65", "PREV_CLOSE": "255.7", "ATH_PRICE": "560.7", "MIN_5D_LOW": "253.9", "PCT_FROM_LOW": "-3.25", "PCT_FROM_ATH": "-56.19", "PCT_1D_CHANGE": "-3.93", "CONFIGS_MATCHED": "C4,C5,C13,C14,C21,C22,C29,C30,C36,C39,C40,C43,C44,C48,C51,C75", "CONFIG_COUNT": "16"}, {"SYMBOL": "KROSS", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "178.11", "PREV_CLOSE": "191.43", "ATH_PRICE": "237.6", "MIN_5D_LOW": "186.0", "PCT_FROM_LOW": "-4.24", "PCT_FROM_ATH": "-25.04", "PCT_1D_CHANGE": "-6.96", "CONFIGS_MATCHED": "C38,C42,C46,C64,C65,C66,C68,C69,C70,C72,C73,C74", "CONFIG_COUNT": "12"}, {"SYMBOL": "TIRUMALCHM", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "174.14", "PREV_CLOSE": "178.8", "ATH_PRICE": "341.0", "MIN_5D_LOW": "178.1", "PCT_FROM_LOW": "-2.22", "PCT_FROM_ATH": "-48.93", "PCT_1D_CHANGE": "-2.61", "CONFIGS_MATCHED": "C39,C40,C41,C43,C44,C45", "CONFIG_COUNT": "6"}, {"SYMBOL": "SOLEX", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "1109.9", "PREV_CLOSE": "1153.6", "ATH_PRICE": "1985.0", "MIN_5D_LOW": "1133.3", "PCT_FROM_LOW": "-2.06", "PCT_FROM_ATH": "-44.09", "PCT_1D_CHANGE": "-3.79", "CONFIGS_MATCHED": "C40,C41,C44,C45", "CONFIG_COUNT": "4"}, {"SYMBOL": "THOMASCOTT", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "253.5", "PREV_CLOSE": "262.75", "ATH_PRICE": "459.8", "MIN_5D_LOW": "260.2", "PCT_FROM_LOW": "-2.57", "PCT_FROM_ATH": "-44.87", "PCT_1D_CHANGE": "-3.52", "CONFIGS_MATCHED": "C40,C41,C44,C45", "CONFIG_COUNT": "4"}, {"SYMBOL": "5PAISA", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "311.6", "PREV_CLOSE": "320.6", "ATH_PRICE": "487.7", "MIN_5D_LOW": "318.0", "PCT_FROM_LOW": "-2.01", "PCT_FROM_ATH": "-36.11", "PCT_1D_CHANGE": "-2.81", "CONFIGS_MATCHED": "C67,C71,C78", "CONFIG_COUNT": "3"}];
+const SIGNALS_RAW = [{"SYMBOL": "EXICOM", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "133.85", "PREV_CLOSE": "144.98", "ATH_PRICE": "275.71", "MIN_5D_LOW": "142.89", "PCT_FROM_LOW": "-6.33", "PCT_FROM_ATH": "-51.45", "PCT_1D_CHANGE": "-7.68", "CONFIGS_MATCHED": "C1,C2,C3,C4,C5,C6,C8,C22,C23,C24,C25,C26", "CONFIG_COUNT": "12"}, {"SYMBOL": "5PAISA", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "311.6", "PREV_CLOSE": "320.6", "ATH_PRICE": "487.7", "MIN_5D_LOW": "318.0", "PCT_FROM_LOW": "-2.01", "PCT_FROM_ATH": "-36.11", "PCT_1D_CHANGE": "-2.81", "CONFIGS_MATCHED": "C2,C3,C5,C6,C7", "CONFIG_COUNT": "5"}, {"SYMBOL": "MEDICAMEQ", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "245.65", "PREV_CLOSE": "255.7", "ATH_PRICE": "560.7", "MIN_5D_LOW": "253.9", "PCT_FROM_LOW": "-3.25", "PCT_FROM_ATH": "-56.19", "PCT_1D_CHANGE": "-3.93", "CONFIGS_MATCHED": "C1,C2,C4,C5,C8", "CONFIG_COUNT": "5"}, {"SYMBOL": "SOLEX", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "1109.9", "PREV_CLOSE": "1153.6", "ATH_PRICE": "1985.0", "MIN_5D_LOW": "1133.3", "PCT_FROM_LOW": "-2.06", "PCT_FROM_ATH": "-44.09", "PCT_1D_CHANGE": "-3.79", "CONFIGS_MATCHED": "C2,C3,C5,C6,C7", "CONFIG_COUNT": "5"}, {"SYMBOL": "THOMASCOTT", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "253.5", "PREV_CLOSE": "262.75", "ATH_PRICE": "459.8", "MIN_5D_LOW": "260.2", "PCT_FROM_LOW": "-2.57", "PCT_FROM_ATH": "-44.87", "PCT_1D_CHANGE": "-3.52", "CONFIGS_MATCHED": "C2,C3,C5,C6,C7", "CONFIG_COUNT": "5"}, {"SYMBOL": "TIRUMALCHM", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "174.14", "PREV_CLOSE": "178.8", "ATH_PRICE": "341.0", "MIN_5D_LOW": "178.1", "PCT_FROM_LOW": "-2.22", "PCT_FROM_ATH": "-48.93", "PCT_1D_CHANGE": "-2.61", "CONFIGS_MATCHED": "C2,C3,C5,C6,C7", "CONFIG_COUNT": "5"}, {"SYMBOL": "DSSL", "SIGNAL_DATE": "2026-06-05", "SIGNAL_CLOSE": "1288.7", "PREV_CLOSE": "1356.5", "ATH_PRICE": "1924.8", "MIN_5D_LOW": "1356.5", "PCT_FROM_LOW": "-5.0", "PCT_FROM_ATH": "-33.05", "PCT_1D_CHANGE": "-5.0", "CONFIGS_MATCHED": "C1,C4,C8,C26", "CONFIG_COUNT": "4"}];
 const NIFTY_DATA  = {"nifty50": {"price": 23366.7, "change": -49.85, "change_pct": -0.21, "date": "05-Jun-2026"}, "banknifty": {"price": 54496.25, "change": 188.4, "change_pct": 0.35, "date": "05-Jun-2026"}, "sensex": {"price": 74243.34, "change": -116.67, "change_pct": -0.16, "date": "05-Jun-2026"}, "niftyit": {"price": 29010.3, "change": -290.3, "change_pct": -0.99, "date": "05-Jun-2026"}, "updated_at": "05-Jun-2026 07:39 PM IST"};
-const CONFIGS_DEF = [{"id": "C1", "name": "Config 1", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C2", "name": "Config 2", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C3", "name": "Config 3", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C4", "name": "Config 4", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C5", "name": "Config 5", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C6", "name": "Config 6", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C7", "name": "Config 7", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C8", "name": "Config 8", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C9", "name": "Config 9", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C10", "name": "Config 10", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C11", "name": "Config 11", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C12", "name": "Config 12", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C13", "name": "Config 13", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C14", "name": "Config 14", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C15", "name": "Config 15", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C16", "name": "Config 16", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C17", "name": "Config 17", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C18", "name": "Config 18", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C19", "name": "Config 19", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C20", "name": "Config 20", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C21", "name": "Config 21", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C22", "name": "Config 22", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C23", "name": "Config 23", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C24", "name": "Config 24", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C25", "name": "Config 25", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C26", "name": "Config 26", "days_back": 5, "pct_min": -0.07, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C27", "name": "Config 27", "days_back": 5, "pct_min": -0.07, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C28", "name": "Config 28", "days_back": 5, "pct_min": -0.07, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C29", "name": "Config 29", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C30", "name": "Config 30", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C31", "name": "Config 31", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C32", "name": "Config 32", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C33", "name": "Config 33", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C34", "name": "Config 34", "days_back": 5, "pct_min": -0.06, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C35", "name": "Config 35", "days_back": 5, "pct_min": -0.06, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C36", "name": "Config 36", "days_back": 5, "pct_min": -0.06, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C37", "name": "Config 37", "days_back": 5, "pct_min": -0.06, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C38", "name": "Config 38", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C39", "name": "Config 39", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.45, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C40", "name": "Config 40", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C41", "name": "Config 41", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C42", "name": "Config 42", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C43", "name": "Config 43", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.45, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C44", "name": "Config 44", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C45", "name": "Config 45", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C46", "name": "Config 46", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C47", "name": "Config 47", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C48", "name": "Config 48", "days_back": 10, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C49", "name": "Config 49", "days_back": 10, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C50", "name": "Config 50", "days_back": 10, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C51", "name": "Config 51", "days_back": 10, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C52", "name": "Config 52", "days_back": 10, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.55, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C53", "name": "Config 53", "days_back": 10, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C54", "name": "Config 54", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C55", "name": "Config 55", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.4, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C56", "name": "Config 56", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C57", "name": "Config 57", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C58", "name": "Config 58", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.4, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C59", "name": "Config 59", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.4, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C60", "name": "Config 60", "days_back": 5, "pct_min": -0.07, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C61", "name": "Config 61", "days_back": 5, "pct_min": -0.07, "pct_max": -0.03, "ath_min": -0.4, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C62", "name": "Config 62", "days_back": 5, "pct_min": -0.06, "pct_max": -0.03, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C63", "name": "Config 63", "days_back": 5, "pct_min": -0.06, "pct_max": -0.03, "ath_min": -0.4, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C64", "name": "Config 64", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C65", "name": "Config 65", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C66", "name": "Config 66", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C67", "name": "Config 67", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C68", "name": "Config 68", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C69", "name": "Config 69", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C70", "name": "Config 70", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C71", "name": "Config 71", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C72", "name": "Config 72", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.55, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C73", "name": "Config 73", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.5, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C74", "name": "Config 74", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.25, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C75", "name": "Config 75", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.45, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C76", "name": "Config 76", "days_back": 10, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C77", "name": "Config 77", "days_back": 10, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.45, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C78", "name": "Config 78", "days_back": 5, "pct_min": -0.08, "pct_max": -0.02, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}];
+const CONFIGS_DEF = [{"id": "C1", "name": "Config 1", "days_back": 5, "pct_min": -0.1, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C2", "name": "Config 2", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C3", "name": "Config 3", "days_back": 5, "pct_min": -0.1, "pct_max": -0.02, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C4", "name": "Config 4", "days_back": 5, "pct_min": -0.09, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C5", "name": "Config 5", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C6", "name": "Config 6", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C7", "name": "Config 7", "days_back": 5, "pct_min": -0.09, "pct_max": -0.02, "ath_min": -0.5, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C8", "name": "Config 8", "days_back": 5, "pct_min": -0.08, "pct_max": -0.03, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C9", "name": "Config 9", "days_back": 5, "pct_min": -0.06, "pct_max": -0.04, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C10", "name": "Config 10", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C11", "name": "Config 11", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C12", "name": "Config 12", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C13", "name": "Config 13", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C14", "name": "Config 14", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.5, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C15", "name": "Config 15", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.45, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C16", "name": "Config 16", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C17", "name": "Config 17", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C18", "name": "Config 18", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C19", "name": "Config 19", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C20", "name": "Config 20", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.45, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C21", "name": "Config 21", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C22", "name": "Config 22", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C23", "name": "Config 23", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C24", "name": "Config 24", "days_back": 5, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C25", "name": "Config 25", "days_back": 5, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C26", "name": "Config 26", "days_back": 5, "pct_min": -0.08, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.3, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C27", "name": "Config 27", "days_back": 5, "pct_min": -0.06, "pct_max": -0.04, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C28", "name": "Config 28", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C29", "name": "Config 29", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C30", "name": "Config 30", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C31", "name": "Config 31", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C32", "name": "Config 32", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C33", "name": "Config 33", "days_back": 10, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C34", "name": "Config 34", "days_back": 10, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C35", "name": "Config 35", "days_back": 10, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C36", "name": "Config 36", "days_back": 10, "pct_min": -0.1, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C37", "name": "Config 37", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C38", "name": "Config 38", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C39", "name": "Config 39", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C40", "name": "Config 40", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C41", "name": "Config 41", "days_back": 10, "pct_min": -0.09, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C42", "name": "Config 42", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C43", "name": "Config 43", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.05, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C44", "name": "Config 44", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C45", "name": "Config 45", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.6, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C46", "name": "Config 46", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.45, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C47", "name": "Config 47", "days_back": 10, "pct_min": -0.09, "pct_max": -0.04, "ath_min": -0.4, "ath_max": -0.35, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C48", "name": "Config 48", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 2, "buy_drop": 0.15, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C49", "name": "Config 49", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.15, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C50", "name": "Config 50", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.6, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.15, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C51", "name": "Config 51", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 3, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}, {"id": "C52", "name": "Config 52", "days_back": 10, "pct_min": -0.1, "pct_max": -0.05, "ath_min": -0.55, "ath_max": -0.4, "max_buys": 4, "buy_drop": 0.1, "target": 0.1, "stoploss": 0.25, "max_duration": 40}];
 
 let ALL_ROWS   = [];
 let TRADE_OHLC = {};
@@ -2521,6 +2275,13 @@ const state = {
   ledger:      {cfg:'ALL', page:1, sort:0, asc:false},
   trades:      {cfg:'ALL', status:'ALL', page:1, sort:0, asc:false},
   signals:     {cfg:'ALL', page:1, sort:0, asc:false},
+  fno:         {cfg:'ALL', page:1, sort:0, asc:false},
+  fnoclosed:   {cfg:'ALL', res:'ALL', page:1, sort:0, asc:false},
+  uniopen:     {page:1, sort:0, asc:false, dedup:'min'},
+  uniclosed:   {res:'ALL', page:1, sort:0, asc:false, dedup:'max'},
+  unifno:      {page:1, sort:0, asc:false, dedup:'min'},
+  unifnoclosed:{res:'ALL', page:1, sort:0, asc:false, dedup:'max'},
+  configs:    {page:1, pgSz:25, filter:'ALL'},
 };
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -2566,7 +2327,7 @@ function cfgBadge(cfg){
 // ─── TABS ─────────────────────────────────────────────────────────────────────
 function showTab(name,el){
   document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
-  document.getElementById('tab-'+name).classList.remove('hidden');
+  const _tp=document.getElementById('tab-'+name);if(_tp)_tp.classList.remove('hidden');else{console.warn('tab-'+name+' panel missing');return;}
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   if(name==='overview') buildOverview();
@@ -2584,6 +2345,13 @@ function showTab(name,el){
   else if(name==='performance') renderPerformance();
   else if(name==='mtfoutput')   renderMTFOutput();
   else if(name==='portfolio')   renderPortfolio();
+  else if(name==='fno')         renderTab('fno');
+  else if(name==='fnoclosed')   renderTab('fnoclosed');
+  else if(name==='configs')    { document.getElementById('cfg-params-table').querySelector('tbody').innerHTML=buildCfgParamsRows(); renderConfigsPage(); updateCfgSelectBtn(); }
+  else if(name==='uniopen')     renderTab('uniopen');
+  else if(name==='uniclosed')   renderTab('uniclosed');
+  else if(name==='unifno')      renderTab('unifno');
+  else if(name==='unifnoclosed') renderTab('unifnoclosed');
 }
 
 // ─── FILTER HELPERS ──────────────────────────────────────────────────────────
@@ -2652,10 +2420,46 @@ function pgHist(dir){
 function setPager(tab,cur,total,pgSz){
   const pages=Math.max(1,Math.ceil(total/pgSz));
   if(cur>pages){state[tab].page=pages;}
-  document.getElementById(tab+'-info').textContent=`${(cur-1)*pgSz+1}–${Math.min(cur*pgSz,total)} of ${total} | Page ${Math.min(cur,pages)}/${pages}`;
+  const _infoEl=document.getElementById(tab+'-info');
+  if(_infoEl) _infoEl.textContent=`${(cur-1)*pgSz+1}–${Math.min(cur*pgSz,total)} of ${total} | Page ${Math.min(cur,pages)}/${pages}`;
 }
 
 // ─── GET FILTERED DATA ────────────────────────────────────────────────────────
+
+// ─── DEDUPLICATE BY SYMBOL ──────────────────────────────────────────────────
+// mode='min': keep cheapest AVG_BUY_PRICE per symbol (Open Positions / F&O Open)
+// mode='max': keep highest  AVG_BUY_PRICE per symbol (Closed Positions / F&O Closed)
+function uniClosedFilter(res, el) {
+  state.uniclosed.res = res;
+  state.uniclosed.page = 1;
+  document.querySelectorAll('[id^="uni-closed-"]').forEach(b => b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderTab('uniclosed');
+}
+function uniFnoClosedFilter(res, el) {
+  state.unifnoclosed.res = res;
+  state.unifnoclosed.page = 1;
+  document.querySelectorAll('[id^="uni-fnoclosed-"]').forEach(b => b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderTab('unifnoclosed');
+}
+
+function dedupeBySymbol(rows, mode) {
+  const map = {};
+  for (const r of rows) {
+    const sym = (r.SYMBOL || '').toUpperCase();
+    const avg = parseFloat(r.AVG_BUY_PRICE) || 0;
+    if (!map[sym]) {
+      map[sym] = r;
+    } else {
+      const ex = parseFloat(map[sym].AVG_BUY_PRICE) || 0;
+      if (mode === 'min' && avg < ex) map[sym] = r;
+      if (mode === 'max' && avg > ex) map[sym] = r;
+    }
+  }
+  return Object.values(map);
+}
+
 function getFiltered(tab){
   let rows = ALL_ROWS;
 
@@ -2740,6 +2544,58 @@ function getFiltered(tab){
       return (openSymbols.has(sym)?'Open Call':'Fresh Call')===statusF;
     });
   }
+  else if(tab==='fno'){
+    rows = rows.filter(r=>r.ORDER==='Executed'&&r.STATUS==='Open'&&FO_SYMBOLS.has((r.SYMBOL||'').toUpperCase()));
+    if(state.fno.cfg!=='ALL') rows=rows.filter(r=>r.CONFIG===state.fno.cfg);
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _fs=(document.getElementById('fno-search')||{}).value||'';
+    if(_fs) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_fs.toUpperCase()));
+  }
+  else if(tab==='fnoclosed'){
+    rows = rows.filter(r=>r.STATUS==='Closed'&&r.RESULT&&FO_SYMBOLS.has((r.SYMBOL||'').toUpperCase()));
+    if(state.fnoclosed.cfg!=='ALL') rows=rows.filter(r=>r.CONFIG===state.fnoclosed.cfg);
+    if(state.fnoclosed.res==='P') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('profit')&&!r.RESULT.includes('FE'));
+    if(state.fnoclosed.res==='L') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('loss')&&!r.RESULT.includes('FE'));
+    if(state.fnoclosed.res==='FE') rows=rows.filter(r=>r.RESULT&&r.RESULT.includes('FE'));
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _fcs=(document.getElementById('fnoclosed-search')||{}).value||'';
+    if(_fcs) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_fcs.toUpperCase()));
+  }
+
+  else if(tab==='uniopen'){
+    rows = rows.filter(r=>r.ORDER==='Executed'&&r.STATUS==='Open');
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _uos=(document.getElementById('uniopen-search')||{}).value||'';
+    if(_uos) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_uos.toUpperCase()));
+    rows = dedupeBySymbol(rows, state.uniopen.dedup||'min');
+  }
+  else if(tab==='uniclosed'){
+    rows = rows.filter(r=>r.STATUS==='Closed'&&r.RESULT);
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _ucs=(document.getElementById('uniclosed-search')||{}).value||'';
+    if(_ucs) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_ucs.toUpperCase()));
+    rows = dedupeBySymbol(rows, state.uniclosed.dedup||'max');
+    if(state.uniclosed.res==='P') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('profit')&&!r.RESULT.includes('FE'));
+    if(state.uniclosed.res==='L') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('loss')&&!r.RESULT.includes('FE'));
+    if(state.uniclosed.res==='FE') rows=rows.filter(r=>r.RESULT&&r.RESULT.includes('FE'));
+  }
+  else if(tab==='unifno'){
+    rows = rows.filter(r=>r.ORDER==='Executed'&&r.STATUS==='Open'&&FO_SYMBOLS.has((r.SYMBOL||'').toUpperCase()));
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _ufs=(document.getElementById('unifno-search')||{}).value||'';
+    if(_ufs) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_ufs.toUpperCase()));
+    rows = dedupeBySymbol(rows, state.unifno.dedup||'min');
+  }
+  else if(tab==='unifnoclosed'){
+    rows = rows.filter(r=>r.STATUS==='Closed'&&r.RESULT&&FO_SYMBOLS.has((r.SYMBOL||'').toUpperCase()));
+    if(dateRangeActive) rows=rows.filter(r=>inDateRange(r.SIGNAL_DATE));
+    const _ufcs=(document.getElementById('unifnoclosed-search')||{}).value||'';
+    if(_ufcs) rows=rows.filter(r=>(r.SYMBOL||'').toUpperCase().includes(_ufcs.toUpperCase()));
+    rows = dedupeBySymbol(rows, state.unifnoclosed.dedup||'max');
+    if(state.unifnoclosed.res==='P') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('profit')&&!r.RESULT.includes('FE'));
+    if(state.unifnoclosed.res==='L') rows=rows.filter(r=>r.RESULT&&r.RESULT.toLowerCase().includes('loss')&&!r.RESULT.includes('FE'));
+    if(state.unifnoclosed.res==='FE') rows=rows.filter(r=>r.RESULT&&r.RESULT.includes('FE'));
+  }
 
   // Sort
   const st=state[tab];
@@ -2760,13 +2616,25 @@ function getFiltered(tab){
 function getTabSortVals(tab,a,b,col){
   const nv=x=>parseFloat(x)||0;
   const sv=x=>x||'';
-  if(tab==='open'){
+  if(tab==='open'||tab==='fno'||tab==='uniopen'||tab==='unifno'){
     const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','AVG_BUY_PRICE','CURRENT_LTP','TARGET_PRICE','STOP_PRICE','BUY_COUNT','TOTAL_QTY','TOTAL_INVESTMENT','MARKET_DAYS','PROFIT','GAIN_PCT'];
     const k=cols[col]||'SYMBOL';
     if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
     return[nv(a[k]),nv(b[k])];
   }
-  if(tab==='closed'){
+  if(tab==='closed'||tab==='fnoclosed'||tab==='uniclosed'||tab==='unifnoclosed'){
+    const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','EXIT_DATE','AVG_BUY_PRICE','EXIT_PRICE','TOTAL_QTY','TOTAL_INVESTMENT','PROFIT','GAIN_PCT','MARKET_DAYS','RESULT'];
+    const k=cols[col]||'EXIT_DATE';
+    if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
+    return[nv(a[k]),nv(b[k])];
+  }
+  if(tab==='uniopen'||tab==='unifno'){
+    const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','AVG_BUY_PRICE','CURRENT_LTP','TARGET_PRICE','STOP_PRICE','BUY_COUNT','TOTAL_QTY','TOTAL_INVESTMENT','MARKET_DAYS','PROFIT','GAIN_PCT'];
+    const k=cols[col]||'SYMBOL';
+    if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
+    return[nv(a[k]),nv(b[k])];
+  }
+  if(tab==='uniclosed'||tab==='unifnoclosed'){
     const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','EXIT_DATE','AVG_BUY_PRICE','EXIT_PRICE','TOTAL_QTY','TOTAL_INVESTMENT','PROFIT','GAIN_PCT','MARKET_DAYS','RESULT'];
     const k=cols[col]||'EXIT_DATE';
     if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
@@ -2818,6 +2686,12 @@ function renderTab(tab){
   if(tab==='open') renderBadges('open-badges', rows, 'open');
   else if(tab==='closed') renderBadges('closed-badges', rows, 'closed');
   else if(tab==='fe') renderBadges('fe-badges', rows, 'open');
+  else if(tab==='fno') renderBadges('fno-badges', rows, 'open');
+  else if(tab==='fnoclosed') renderBadges('fnoclosed-badges', rows, 'closed');
+  else if(tab==='uniopen') renderBadges('uniopen-badges', rows, 'open');
+  else if(tab==='unifno') renderBadges('unifno-badges', rows, 'open');
+  else if(tab==='uniclosed') renderBadges('uniclosed-badges', rows, 'closed');
+  else if(tab==='unifnoclosed') renderBadges('unifnoclosed-badges', rows, 'closed');
   else if(tab==='trades'){
     const tProfit=rows.filter(r=>(parseFloat(r.PROFIT)||0)>0).length;
     const tLoss=rows.filter(r=>(parseFloat(r.PROFIT)||0)<0).length;
@@ -2843,13 +2717,17 @@ function renderTab(tab){
 }
 
 function rowHTML(tab,r,n){
-  if(tab==='open'){
+  if(tab==='open'||tab==='fno'||tab==='uniopen'||tab==='unifno'){
     const pl=parseFloat(r.PROFIT)||0;
     const gp=parseFloat(r.GAIN_PCT)||0;
     const bc=parseInt(r.BUY_COUNT||1);
     const bcHtml=bc>1
       ?`<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:900;background:linear-gradient(135deg,var(--blue2),var(--cyan2));color:#fff">${bc}x</span>`
       :`<span style="color:var(--text3)">${bc}</span>`;
+    const _sc=parseFloat(r.SIGNAL_CLOSE)||0;
+    const _ltp=parseFloat(r.CURRENT_LTP)||0;
+    const _b2=+(_sc*0.9).toFixed(2);
+    const _b3=+((_sc+_b2)/2*0.9).toFixed(2);
     return `<tr>
       <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td>
@@ -2861,7 +2739,7 @@ function rowHTML(tab,r,n){
       <td ${pnlColor(r.GAIN_PCT)}>${gp>=0?'+':''}${f2(r.GAIN_PCT)}%</td>
     </tr>`;
   }
-  if(tab==='closed'){
+  if(tab==='closed'||tab==='fnoclosed'||tab==='uniclosed'||tab==='unifnoclosed'){
     return `<tr>
       <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
       <td>${fD(r.SIGNAL_DATE)}</td><td>${fD(r.EXIT_DATE)}</td>
@@ -2941,6 +2819,7 @@ function renderSignals(rows){
   const slice=rows.slice(start,start+pgSz);
   setPager('signals',page,rows.length,pgSz);
   const body=document.getElementById('signals-body');
+  if(!body){console.warn('signals-body missing');return;}
   if(!slice.length){body.innerHTML='<tr><td colspan="11" class="empty">No signals.</td></tr>';return;}
   body.innerHTML=slice.map((r,i)=>{
     const sym=r.SYMBOL||r.symbol||'—';
@@ -3131,11 +3010,12 @@ function buildHistory(){
   setPager('hist',page,rows.length,pgSz);
 
   if(!slice.length){
-    document.getElementById('hist-container').innerHTML='<div class="card empty">No executed trades found.</div>';
+    const _hce=document.getElementById('hist-container');if(_hce)_hce.innerHTML='<div class="card empty">No executed trades found.</div>';
     return;
   }
 
-  document.getElementById('hist-container').innerHTML=slice.map((r,i)=>{
+  const _hc=document.getElementById('hist-container');if(!_hc)return;
+  _hc.innerHTML=slice.map((r,i)=>{
     const pnl=parseFloat(r.PROFIT)||0;
     const pct=parseFloat(r.GAIN_PCT)||0;
     const isSold=r.STATUS!=='Open';
@@ -4111,6 +3991,36 @@ function mtfTgtChange() {
   renderMTFOutput();
 }
 
+
+// ════ UNI TAB MODE SELECTOR ════
+function setUniMode(tab, mode, btn){
+  state[tab].dedup = mode;
+  state[tab].page  = 1;
+  // Toggle active state on min/max buttons
+  var minBtn = document.getElementById(tab+'-mode-min');
+  var maxBtn = document.getElementById(tab+'-mode-max');
+  if(minBtn) minBtn.classList.toggle('active', mode==='min');
+  if(maxBtn) maxBtn.classList.toggle('active', mode==='max');
+  renderTab(tab);
+}
+
+// ════ MTF EXCEL EXPORT ════
+function exportMTFExcel(){
+  var rows=[];
+  var hdrs=['#','Symbol','Signal Date','Signal Price ₹','Avg Buy ₹','Current LTP ₹','Drop%','Qty','Investment ₹','Target ₹','Stoploss ₹','Buys Done','Days Held'];
+  document.getElementById('mtf-body').querySelectorAll('tr').forEach(function(tr){
+    var cells=[...tr.querySelectorAll('td')].map(function(td){return td.innerText.trim();});
+    if(cells.length>0) rows.push(cells.slice(0,13));
+  });
+  if(!rows.length){toast('No data to export','info');return;}
+  try{
+    var wb=XLSX.utils.book_new();
+    var ws=XLSX.utils.aoa_to_sheet([hdrs].concat(rows));
+    XLSX.utils.book_append_sheet(wb,ws,'MTF Output');
+    XLSX.writeFile(wb,'NSE_BTST_MTF_Output_'+new Date().toISOString().slice(0,10)+'.xlsx');
+    toast('Excel downloaded!','success');
+  }catch(e){toast('Export failed: '+e.message,'info');}
+}
 function exportMTFCSV() {
   const rows = [...document.getElementById('mtf-body').querySelectorAll('tr')].map(tr =>
     [...tr.querySelectorAll('td')].slice(0, 11).map(td => '"' + td.innerText.replace(/"/g, '""') + '"').join(',')
@@ -4396,16 +4306,139 @@ async function portfolioManualAdd() {
 }
 
 
-function cfgTabFilter(val, btn) {
-  document.querySelectorAll('[id^="cfgtab-"]').forEach(function(b){ b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  var rows = document.querySelectorAll('#tab-configs table tbody tr');
-  rows.forEach(function(row) {
-    if (val === 'ALL') { row.style.display = ''; return; }
-    var badge = row.querySelector('.cfg-badge');
-    row.style.display = (badge && badge.textContent.trim() === val) ? '' : 'none';
-  });
+
+
+// ─── CONFIGS TAB SELECT POPUP ──────────────────────────────────────────────────
+var _cfgSelTemp = new Set(); // temporary selection while modal is open
+var _cfgTabActive = 'ALL';  // current applied filter for configs tab
+
+function openCfgSelectModal(){
+  buildCfgSelGrid();
+  _cfgSelTemp = new Set();
+  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
+  if(_cfgTabActive==='ALL'||_cfgTabActive==='') allBtns.forEach(function(b){_cfgSelTemp.add(b.dataset.id);});
+  else _cfgTabActive.split(',').forEach(function(id){_cfgSelTemp.add(id.trim());});
+  updateCfgSelGrid();
+  var m=document.getElementById('cfg-select-modal');
+  m.style.display='flex';
 }
+function closeCfgSelectModal(){
+  document.getElementById('cfg-select-modal').style.display='none';
+}
+function updateCfgSelGrid(){
+  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
+  allBtns.forEach(function(b){
+    var sel=_cfgSelTemp.has(b.dataset.id);
+    b.style.background=sel?'var(--navy)':'transparent';
+    b.style.color=sel?'#fff':'var(--text2)';
+    b.style.borderColor=sel?'var(--navy)':'var(--border)';
+  });
+  var count=_cfgSelTemp.size;
+  var total=allBtns.length;
+  document.getElementById('cfg-sel-count').textContent=count+' of '+total+' selected';
+}
+function buildCfgSelGrid(){
+  var grid=document.getElementById('cfg-sel-grid');
+  if(!grid) return;
+  if(grid.children.length>0) return; // already built
+  var ids=(CONFIGS_DEF||[]).map(function(c){return c.id||c.ID;}).filter(Boolean);
+  grid.innerHTML=ids.map(function(id){
+    return '<button class="cfg-sel-btn" data-id="'+id+'" onclick="cfgSelToggle(\''+id+'\') " style="padding:7px 14px;border-radius:8px;border:2px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;min-width:52px;">'+id+'</button>';
+  }).join('');
+}
+function cfgSelToggle(id){
+  if(_cfgSelTemp.has(id)) _cfgSelTemp.delete(id);
+  else _cfgSelTemp.add(id);
+  updateCfgSelGrid();
+}
+function cfgSelAll(){
+  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
+  allBtns.forEach(function(b){_cfgSelTemp.add(b.dataset.id);});
+  updateCfgSelGrid();
+}
+function cfgSelClear(){
+  _cfgSelTemp.clear();
+  updateCfgSelGrid();
+}
+function applyCfgSelect(){
+  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
+  var allIds=allBtns.map(function(b){return b.dataset.id;});
+  if(_cfgSelTemp.size===0||_cfgSelTemp.size===allIds.length){
+    _cfgTabActive='ALL';
+  } else if(_cfgSelTemp.size===1){
+    _cfgTabActive=Array.from(_cfgSelTemp)[0];
+  } else {
+    _cfgTabActive=Array.from(_cfgSelTemp).join(',');
+  }
+  updateCfgSelectBtn();
+  closeCfgSelectModal();
+  renderConfigsPage();
+}
+function updateCfgSelectBtn(){
+  var btn=document.getElementById('cfg-select-open-btn');
+  if(!btn) return;
+  var total=(CONFIGS_DEF||[]).length;
+  var label;
+  if(_cfgTabActive==='ALL'||_cfgTabActive==='') label='&#9881; Configurations (All '+total+' selected)';
+  else if(_cfgTabActive.includes(',')){ var cnt=_cfgTabActive.split(',').length; label='&#9881; Configurations ('+cnt+' of '+total+' selected)'; }
+  else label='&#9881; Configurations ('+_cfgTabActive+' only)';
+  btn.innerHTML=label;
+}
+function buildCfgParamsRows(){
+  if(!CONFIGS_DEF||!CONFIGS_DEF.length) return '<tr><td colspan="11" class="empty">No configs loaded.</td></tr>';
+  return CONFIGS_DEF.map(function(c){
+    var id=c.id||c.ID||'';
+    return '<tr><td><span class="cfg-badge">'+id+'</span></td>'
+      +'<td>'+(c.days_back||c.DAYS_BACK||'')+'</td>'
+      +'<td>'+(c.pct_min||c.PCT_MIN||'')+'</td>'
+      +'<td>'+(c.pct_max||c.PCT_MAX||'')+'</td>'
+      +'<td>'+(c.ath_min||c.ATH_MIN||c.ath_drop_min||'')+'</td>'
+      +'<td>'+(c.ath_max||c.ATH_MAX||c.ath_drop_max||'')+'</td>'
+      +'<td>'+(c.max_buys||c.MAX_BUYS||'')+'</td>'
+      +'<td>'+(c.buy_drop||c.BUY_DROP||'')+'</td>'
+      +'<td>'+(c.target||c.TARGET||'')+'</td>'
+      +'<td>'+(c.stop_loss||c.STOP_LOSS||c.sl||'')+'</td>'
+      +'<td>'+(c.max_duration||c.MAX_DURATION||'')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+function renderConfigsPage(){
+  // Build rows if empty
+  var tbody=document.getElementById('cfg-params-body');
+  if(tbody&&!tbody.children.length) tbody.innerHTML=buildCfgParamsRows();
+  var pgSzEl=document.getElementById('configs-pgsize');
+  var pgSz=pgSzEl?parseInt(pgSzEl.value):25;
+  var allRows=Array.from(document.querySelectorAll('#cfg-params-table tbody tr'));
+  var filtered=allRows.filter(function(tr){
+    if(_cfgTabActive==='ALL'||_cfgTabActive==='') return true;
+    if(_cfgTabActive.includes(',')){
+      var ids=_cfgTabActive.split(',');
+      var cfg=tr.children[0]?tr.children[0].textContent.trim():'';
+      return ids.includes(cfg);
+    }
+    var cfg=tr.children[0]?tr.children[0].textContent.trim():'';
+    return cfg===_cfgTabActive;
+  });
+  var page=window._cfgPage||1;
+  var total=filtered.length;
+  var pages=Math.max(1,Math.ceil(total/pgSz));
+  if(page>pages) page=1;
+  window._cfgPage=page;
+  var start=(page-1)*pgSz;
+  allRows.forEach(function(tr){tr.style.display='none';});
+  filtered.slice(start,start+pgSz).forEach(function(tr){tr.style.display='';});
+  var info=document.getElementById('configs-page-info');
+  if(info) info.textContent='Page '+page+' of '+pages+' ('+total+' total)';
+  var prev=document.getElementById('configs-prev');
+  var next=document.getElementById('configs-next');
+  if(prev) prev.disabled=page<=1;
+  if(next) next.disabled=page>=pages;
+}
+function configsChangePage(delta){
+  window._cfgPage=(window._cfgPage||1)+delta;
+  renderConfigsPage();
+}
+
 function showPATModal() {
   document.getElementById('pat-modal').classList.remove('hidden');
   document.getElementById('pat-input').value = localStorage.getItem('btst_gh_pat') || '';
