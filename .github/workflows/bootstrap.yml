@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       months_back:
-        description: 'How many months of history to download (default 14)'
+        description: 'Months of history to download (default 14)'
         required: false
         default: '14'
 
@@ -14,45 +14,77 @@ permissions:
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 360
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
 
       - name: Install dependencies
-        run: pip install pandas numpy pyarrow requests
+        run: pip install pandas numpy pyarrow requests openpyxl
 
-      - name: Download Historical Bhavcopy
+      - name: Step 1 – Download historical bhavcopy
         run: |
           export MONTHS_BACK=${{ github.event.inputs.months_back }}
           python src/00_bootstrap_historical.py
 
-      - name: Build DB
+      - name: Step 2 – Build DB (consolidate → filter → ATH)
         run: |
           python src/01_consolidate_csv.py
           python src/02_filter_eq.py
           python src/03_find_ath.py
 
-      - name: Run Signals
-        run: python src/04_run_daily_signals.py
+      - name: Step 3 – Cleanup raw bhav CSVs (keep repo small)
+        run: find bhav_data/ -name "*.csv" -delete || true
 
-      - name: Build Dashboard
+      - name: Step 4 – Historical signal backfill (Jan 2025 → today)
+        run: python src/00b_historical_backfill.py
+        env:
+          SIGNAL_START_DATE: '2025-01-01'
+
+      - name: Step 5 – Run simulation (all 78 configs)
+        run: python src/05_run_simulation.py
+
+      - name: Step 6 – Build dashboard HTML
         run: python src/05_build_dashboard.py
 
-      - name: Commit
+      - name: Step 7 – Push to public dashboard repo
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git config user.name  "github-actions[bot]"
+          cd /tmp
+          git clone https://x-access-token:${GH_PAT}@github.com/spurandhar0/nse-btst-signals-dashboard-v2.git pub-dashboard
+          mkdir -p pub-dashboard/docs/data
+          cp $GITHUB_WORKSPACE/docs/index.html pub-dashboard/docs/index.html
+          for f in $GITHUB_WORKSPACE/docs/data/sim_results_C*.json; do
+            [ -f "$f" ] && cp "$f" pub-dashboard/docs/data/ || true
+          done
+          [ -f "$GITHUB_WORKSPACE/docs/data/sim_meta.json" ] && cp $GITHUB_WORKSPACE/docs/data/sim_meta.json pub-dashboard/docs/data/ || true
+          [ -f "$GITHUB_WORKSPACE/docs/data/trade_ohlc.json" ] && cp $GITHUB_WORKSPACE/docs/data/trade_ohlc.json pub-dashboard/docs/data/ || true
+          [ -f "$GITHUB_WORKSPACE/docs/data/mtf_symbols.json" ] && cp $GITHUB_WORKSPACE/docs/data/mtf_symbols.json pub-dashboard/docs/data/ || true
+          cd pub-dashboard
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bhav_data/ db/ output/ docs/
-          git diff --cached --quiet && echo "Nothing to commit" && exit 0
-          git commit -m "bootstrap: $(date +'%d-%b-%Y') -- $(ls bhav_data/*.csv 2>/dev/null | wc -l) files"
-          git pull --rebase origin main || true
+          git add docs/
+          git diff --staged --quiet && echo "Nothing to push" || git commit -m "Bootstrap update: $(date +'%Y-%m-%d')"
+          git push origin main
+
+      - name: Step 8 – Commit private repo data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git rebase origin/main || (git rebase --abort && git merge -X theirs origin/main) || true
+          git add bhav_data/ db/ docs/data/ || true
+          find output/ -maxdepth 3 \( -name "*.csv" -o -name "*.json" -o -name ".gitignore" \) | xargs git add 2>/dev/null || true
+          git diff --staged --quiet && echo "Nothing to commit" || git commit -m "Bootstrap: $(date +'%Y-%m-%d') -- $(ls bhav_data/*.parquet 2>/dev/null | wc -l) files"
           git push origin HEAD:main
