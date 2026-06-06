@@ -1,0 +1,87 @@
+name: Backfill Symbol Data (NSE)
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: 'Comma-separated symbols to backfill (e.g. KALYANKJIL,HDFCBANK)'
+        required: true
+      start_date:
+        description: 'Start date YYYY-MM-DD (default 2025-01-01)'
+        required: false
+        default: '2025-01-01'
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install pandas numpy pyarrow requests openpyxl
+
+      - name: Fetch NSE historical data
+        run: python src/backfill_symbol.py
+        env:
+          BACKFILL_SYMBOLS: ${{ github.event.inputs.symbols }}
+          SIGNAL_START_DATE: ${{ github.event.inputs.start_date }}
+
+      - name: Rebuild derived DB layers
+        run: |
+          python src/02_filter_eq.py
+          python src/03_find_ath.py
+
+      - name: Historical signal backfill
+        run: python src/00b_historical_backfill.py
+        env:
+          SIGNAL_START_DATE: ${{ github.event.inputs.start_date }}
+
+      - name: Run simulation
+        run: python src/05_run_simulation.py
+
+      - name: Build dashboard
+        run: python src/05_build_dashboard.py
+
+      - name: Push to public dashboard
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          cd /tmp
+          git clone https://x-access-token:${GH_PAT}@github.com/spurandhar0/nse-btst-signals-dashboard-v2.git pub-dashboard
+          mkdir -p pub-dashboard/docs/data
+          cp $GITHUB_WORKSPACE/docs/index.html pub-dashboard/docs/index.html
+          for f in $GITHUB_WORKSPACE/docs/data/sim_results_C*.json; do
+            [ -f "$f" ] && cp "$f" pub-dashboard/docs/data/ || true
+          done
+          [ -f "$GITHUB_WORKSPACE/docs/data/sim_meta.json" ] && cp $GITHUB_WORKSPACE/docs/data/sim_meta.json pub-dashboard/docs/data/ || true
+          cd pub-dashboard
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet && echo "Nothing to push" || git commit -m "Backfill update: ${{ github.event.inputs.symbols }}"
+          git push origin main
+
+      - name: Commit private repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git rebase origin/main || (git rebase --abort && git merge -X theirs origin/main) || true
+          git add db/ docs/data/ src/backfill_symbol.py || true
+          git diff --staged --quiet && echo "Nothing to commit" || git commit -m "Backfill: ${{ github.event.inputs.symbols }} from ${{ github.event.inputs.start_date }}"
+          git push origin HEAD:main
