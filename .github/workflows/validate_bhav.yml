@@ -15,7 +15,7 @@ name: Validate & Backfill NSE Bhav Data
 on:
   schedule:
     # 5:30 PM IST = 12:00 UTC  — runs after NSE closes at 3:30 PM IST
-    - cron: '0 12 * * 1-5'
+    - cron: '30 4 * * 6'
   workflow_dispatch:
     inputs:
       from_date:

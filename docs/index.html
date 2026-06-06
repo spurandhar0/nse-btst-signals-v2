@@ -759,6 +759,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
         <th onclick="srt('uniopen',11)">MARKET DAYS</th>
         <th onclick="srt('uniopen',12)">UNREAL P&amp;L &#8377;</th>
         <th onclick="srt('uniopen',13)">GAIN %</th>
+        <th>Buy&#8321;</th><th>Buy&#8322;</th><th>Buy&#8323;</th><th>Buy&#8324;</th>
       </tr></thead>
       <tbody id="uniopen-body"></tbody></table>
     </div>
@@ -840,6 +841,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
         <th onclick="srt('unifno',11)">MARKET DAYS</th>
         <th onclick="srt('unifno',12)">UNREAL P&amp;L &#8377;</th>
         <th onclick="srt('unifno',13)">GAIN %</th>
+        <th>Buy&#8321;</th><th>Buy&#8322;</th><th>Buy&#8323;</th><th>Buy&#8324;</th>
       </tr></thead>
       <tbody id="unifno-body"></tbody></table>
     </div>
@@ -2616,7 +2618,33 @@ function getFiltered(tab){
 function getTabSortVals(tab,a,b,col){
   const nv=x=>parseFloat(x)||0;
   const sv=x=>x||'';
-  if(tab==='open'||tab==='fno'||tab==='uniopen'||tab==='unifno'){
+  if(tab==='uniopen'||tab==='unifno'){
+    const gp=parseFloat(r.GAIN_PCT)||0;
+    const bc=parseInt(r.BUY_COUNT||1);
+    const bcHtml=bc>1
+      ?`<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:900;background:linear-gradient(135deg,var(--blue2),var(--cyan2));color:#fff">${bc}x</span>`
+      :`<span style="color:var(--text3)">${bc}</span>`;
+    const s=parseFloat(r.SIGNAL_CLOSE)||0;
+    const b2=+(s*.9).toFixed(2);
+    const b3=+(s*.855).toFixed(2);
+    const b4=+(s*.7695).toFixed(2);
+    const _g='background:rgba(5,150,105,0.38);font-weight:700;';
+    return `<tr>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
+      <td>${fD(r.SIGNAL_DATE)}</td>
+      <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td>
+      <td>&#8377;${fN(r.CURRENT_LTP)}</td>
+      <td>&#8377;${fN(r.TARGET_PRICE)}</td><td>&#8377;${fN(r.STOP_PRICE)}</td>
+      <td>${bcHtml}</td>
+      <td>${fI(r.TOTAL_QTY)}</td>
+      <td>&#8377;${fN(r.TOTAL_INVESTMENT)}</td>
+      <td>${fI(r.MARKET_DAYS)}</td>
+      <td ${pnlColor(r.PROFIT)}>&#8377;${fN(r.PROFIT)}</td>
+      <td ${pnlColor(r.GAIN_PCT)}>${gp>=0?'+':''}${f2(r.GAIN_PCT)}%</td>
+      ${(bc>=1?'<td style="'+_g+'">':'<td>')}&#8377;${fN(s)}</td>${(bc>=2?'<td style="'+_g+'">':'<td>')}&#8377;${fN(b2)}</td>${(bc>=3?'<td style="'+_g+'">':'<td>')}&#8377;${fN(b3)}</td>${(bc>=4?'<td style="'+_g+'">':'<td>')}&#8377;${fN(b4)}</td>
+    </tr>`;
+  }
+  if(tab==='open'||tab==='fno'){
     const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','AVG_BUY_PRICE','CURRENT_LTP','TARGET_PRICE','STOP_PRICE','BUY_COUNT','TOTAL_QTY','TOTAL_INVESTMENT','MARKET_DAYS','PROFIT','GAIN_PCT'];
     const k=cols[col]||'SYMBOL';
     if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
@@ -2717,7 +2745,7 @@ function renderTab(tab){
 }
 
 function rowHTML(tab,r,n){
-  if(tab==='open'||tab==='fno'||tab==='uniopen'||tab==='unifno'){
+  if(tab==='open'||tab==='fno'){
     const pl=parseFloat(r.PROFIT)||0;
     const gp=parseFloat(r.GAIN_PCT)||0;
     const bc=parseInt(r.BUY_COUNT||1);
