@@ -137,49 +137,80 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 
 .fo-badge{background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;white-space:nowrap}
 
-/* ── LOGIN GATE ──────────────────────────────────────────────────── */
-#login-gate {
-  position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2a 0%,#1e3a5f 60%,#0f2940 100%);
-  z-index:99999;display:flex;align-items:center;justify-content:center;
-}
-#login-gate .login-box {
-  background:#fff;border-radius:18px;padding:40px 44px 36px;min-width:360px;max-width:420px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;
-}
-#login-gate .login-logo { font-size:28px;font-weight:900;color:#0d1f3c;letter-spacing:-0.5px;margin-bottom:4px; }
-#login-gate .login-sub { font-size:13px;color:#64748b;margin-bottom:28px; }
-#login-gate input {
-  width:100%;box-sizing:border-box;padding:11px 14px;border-radius:9px;
-  border:1.5px solid #e2e8f0;font-size:15px;margin-bottom:14px;transition:border-color .2s;outline:none;
-}
-#login-gate input:focus { border-color:#2563eb; }
-#login-gate .btn-login {
-  width:100%;padding:12px;border:none;border-radius:9px;
-  background:linear-gradient(135deg,#0d1f3c,#2563eb);color:#fff;
-  font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s;
-}
-#login-gate .btn-login:hover { opacity:.9; }
-#login-gate .login-err { color:#dc2626;font-size:13px;margin-top:8px;min-height:18px;font-weight:500; }
-#login-gate .login-footer { margin-top:22px;font-size:11px;color:#94a3b8; }
+
+/* ── LOGIN GATE ─────────────────────────────────── */
+#login-gate{position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2a 0%,#1e3a5f 60%,#0f2940 100%);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',sans-serif;}
+#login-gate.hidden{display:none;}
+.lg-box{background:#fff;border-radius:18px;padding:40px 44px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;position:relative;}
+.lg-logo{font-size:26px;font-weight:900;color:#0d1f3c;letter-spacing:-0.5px;margin-bottom:4px;}
+.lg-sub{font-size:13px;color:#64748b;margin-bottom:28px;}
+.lg-field{position:relative;margin-bottom:14px;}
+.lg-field input{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:9px;border:1.5px solid #e2e8f0;font-size:15px;transition:border-color .2s;outline:none;}
+.lg-field input:focus{border-color:#2563eb;}
+.lg-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#94a3b8;font-size:18px;user-select:none;}
+.lg-eye:hover{color:#2563eb;}
+.btn-login{width:100%;padding:12px;border:none;border-radius:9px;background:linear-gradient(135deg,#0d1f3c,#2563eb);color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .2s;}
+.btn-login:hover{opacity:.9;}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;}
+.lg-err{color:#dc2626;font-size:13px;margin-top:10px;min-height:18px;font-weight:500;}
+.lg-footer{margin-top:20px;font-size:11px;color:#94a3b8;}
+/* progress bar */
+#lg-progress{position:fixed;top:0;left:0;width:0;height:4px;background:linear-gradient(90deg,#2563eb,#10b981);z-index:100000;transition:width .4s ease;border-radius:0 2px 2px 0;}
+/* user mgmt modal */
+#ums-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200000;display:flex;align-items:center;justify-content:center;}
+#ums-modal.hidden{display:none;}
+.ums-box{background:#fff;border-radius:14px;padding:28px 32px;width:420px;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.3);}
+.ums-box h3{margin:0 0 18px;font-size:17px;color:#0d1f3c;}
+.ums-row{display:flex;gap:8px;margin-bottom:10px;}
+.ums-row input{flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;}
+.ums-add{padding:8px 14px;background:#2563eb;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;white-space:nowrap;}
+.ums-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;}
+.ums-table th{background:#0d1b2a;color:#fff;padding:7px 10px;text-align:left;}
+.ums-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+.ums-del{background:#dc2626;color:#fff;border:none;border-radius:5px;padding:3px 9px;cursor:pointer;font-size:12px;}
+.ums-close{float:right;background:#64748b;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:13px;}
 
 </style>
 </head>
 <body>
-<!-- ── LOGIN GATE ──────────────────────────────────────────── -->
+
+<!-- ── LOGIN GATE ── -->
+<div id="lg-progress"></div>
 <div id="login-gate">
-  <div class="login-box">
-    <div class="login-logo">&#128202; NSE BTST Dashboard</div>
-    <div class="login-sub">Secure access &mdash; enter your credentials</div>
-    <input type="text" id="lg-user" placeholder="Username" autocomplete="username"
-           onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()" />
-    <input type="password" id="lg-pass" placeholder="Password" autocomplete="current-password"
-           onkeydown="if(event.key==='Enter')_doLogin()" />
-    <button class="btn-login" onclick="_doLogin()">Sign In &#8594;</button>
-    <div class="login-err" id="lg-err"></div>
-    <div class="login-footer">NSE BTST Signals &mdash; Private Dashboard</div>
+  <div class="lg-box">
+    <div class="lg-logo">&#128202; NSE BTST Dashboard</div>
+    <div class="lg-sub">Secure access &mdash; enter your credentials</div>
+    <div class="lg-field">
+      <input type="text" id="lg-user" placeholder="Username" autocomplete="username"
+             onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()" />
+    </div>
+    <div class="lg-field">
+      <input type="password" id="lg-pass" placeholder="Password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')_doLogin()" />
+      <span class="lg-eye" id="lg-eye" onclick="_toggleEye()" title="Show/Hide password">&#128065;</span>
+    </div>
+    <button class="btn-login" id="lg-btn" onclick="_doLogin()">Sign In &#8594;</button>
+    <div class="lg-err" id="lg-err"></div>
+    <div class="lg-footer">NSE BTST Signals &mdash; Private Dashboard</div>
   </div>
 </div>
 
+<!-- ── USER MANAGEMENT MODAL (admin only) ── -->
+<div id="ums-modal" class="hidden">
+  <div class="ums-box">
+    <button class="ums-close" onclick="document.getElementById('ums-modal').classList.add('hidden')">&#x2715; Close</button>
+    <h3>&#128100; Manage Users</h3>
+    <div class="ums-row">
+      <input type="text" id="ums-uname" placeholder="New username" />
+      <input type="password" id="ums-pwd" placeholder="Password" />
+      <button class="ums-add" onclick="_umsAdd()">+ Add</button>
+    </div>
+    <table class="ums-table" id="ums-tbl">
+      <thead><tr><th>#</th><th>Username</th><th>Role</th><th></th></tr></thead>
+      <tbody id="ums-tbody"></tbody>
+    </table>
+  </div>
+</div>
 
 <header>
   <div class="hdr">
@@ -2178,6 +2209,127 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 <div id="toast-container"></div>
 
 <script>
+
+/* ═══════════════════════════════════════════════
+   LOGIN GATE  —  multi-user, session-based
+   ═══════════════════════════════════════════════ */
+(function(){
+  /* ── Default users (username → btoa(password)) ─────────────────
+     Add extra entries here; they are the built-in fallback.
+     Runtime additions are stored in localStorage under _lg_users.  */
+  var _BUILTIN = [
+    {u:'admin',    p:btoa('NSE@BTST#2024'), role:'admin'},
+    {u:'viewer',   p:btoa('View@2024'),     role:'viewer'}
+  ];
+
+  /* ── Helpers ────────────────────────────────────────────────── */
+  function _getUsers(){
+    try{ return JSON.parse(localStorage.getItem('_lg_users')||'null')||_BUILTIN; }
+    catch(e){ return _BUILTIN; }
+  }
+  function _saveUsers(arr){ localStorage.setItem('_lg_users',JSON.stringify(arr)); }
+
+  /* ── Check session ──────────────────────────────────────────── */
+  var _sess = sessionStorage.getItem('_lg_ok');
+  if(_sess){
+    var gate=document.getElementById('login-gate');
+    if(gate) gate.classList.add('hidden');
+    /* show manage-users button if admin */
+    try{
+      var info=JSON.parse(_sess);
+      if(info && info.role==='admin') _injectAdminBtn();
+    }catch(e){}
+  }
+
+  /* ── Main login ─────────────────────────────────────────────── */
+  window._doLogin = function(){
+    var u=(document.getElementById('lg-user').value||'').trim();
+    var p=(document.getElementById('lg-pass').value||'');
+    var err=document.getElementById('lg-err');
+    var btn=document.getElementById('lg-btn');
+    if(!u||!p){ err.textContent='Please enter username and password.'; return; }
+
+    var users=_getUsers();
+    var match=users.find(function(x){ return x.u===u && x.p===btoa(p); });
+    if(!match){ err.textContent='Invalid username or password.'; document.getElementById('lg-pass').value=''; document.getElementById('lg-pass').focus(); return; }
+
+    /* ── SUCCESS: show progress bar ─────────────────────────── */
+    err.textContent='';
+    btn.disabled=true; btn.textContent='Signing in…';
+    var bar=document.getElementById('lg-progress');
+    bar.style.width='20%';
+    setTimeout(function(){ bar.style.width='55%'; },300);
+    setTimeout(function(){ bar.style.width='80%'; },700);
+    setTimeout(function(){
+      bar.style.width='100%';
+      setTimeout(function(){
+        sessionStorage.setItem('_lg_ok', JSON.stringify({u:match.u, role:match.role}));
+        var gate=document.getElementById('login-gate');
+        if(gate) gate.classList.add('hidden');
+        bar.style.width='0';
+        btn.disabled=false; btn.textContent='Sign In \u2192';
+        if(match.role==='admin') _injectAdminBtn();
+      },350);
+    },1200);
+  };
+
+  /* ── Eye toggle ─────────────────────────────────────────────── */
+  window._toggleEye = function(){
+    var inp=document.getElementById('lg-pass');
+    var eye=document.getElementById('lg-eye');
+    if(inp.type==='password'){ inp.type='text'; eye.innerHTML='&#128064;'; }
+    else { inp.type='password'; eye.innerHTML='&#128065;'; }
+  };
+
+  /* ── Admin "Manage Users" button ─────────────────────────────── */
+  function _injectAdminBtn(){
+    if(document.getElementById('_ums-btn')) return;
+    var btn=document.createElement('button');
+    btn.id='_ums-btn';
+    btn.title='Manage Users';
+    btn.innerHTML='&#128100; Users';
+    btn.style.cssText='position:fixed;bottom:18px;right:18px;z-index:50000;background:#0d1f3c;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);';
+    btn.onclick=_umsOpen;
+    document.body.appendChild(btn);
+  }
+
+  /* ── User management ─────────────────────────────────────────── */
+  window._umsOpen = function(){
+    _umsRender();
+    document.getElementById('ums-modal').classList.remove('hidden');
+  };
+  window._umsAdd = function(){
+    var u=(document.getElementById('ums-uname').value||'').trim();
+    var p=(document.getElementById('ums-pwd').value||'').trim();
+    if(!u||!p){ alert('Both username and password are required.'); return; }
+    var users=_getUsers();
+    if(users.find(function(x){ return x.u===u; })){ alert('Username already exists.'); return; }
+    users.push({u:u, p:btoa(p), role:'viewer'});
+    _saveUsers(users);
+    document.getElementById('ums-uname').value='';
+    document.getElementById('ums-pwd').value='';
+    _umsRender();
+  };
+  window._umsDel = function(uname){
+    var sess=JSON.parse(sessionStorage.getItem('_lg_ok')||'{}');
+    if(sess.u===uname){ alert("You cannot delete your own account."); return; }
+    if(!confirm('Delete user "'+uname+'"?')) return;
+    var users=_getUsers().filter(function(x){ return x.u!==uname; });
+    _saveUsers(users);
+    _umsRender();
+  };
+  function _umsRender(){
+    var tbody=document.getElementById('ums-tbody');
+    if(!tbody) return;
+    var users=_getUsers();
+    tbody.innerHTML=users.map(function(u,i){
+      return '<tr><td>'+(i+1)+'</td><td><b>'+u.u+'</b></td><td>'+u.role+'</td>'
+        +'<td><button class="ums-del" onclick="_umsDel(\''+u.u+'\')">&#x1F5D1;</button></td></tr>';
+    }).join('');
+  }
+})();
+
+
 // ─── DATA — loaded asynchronously to keep index.html small ────────────────────
 // SIGNALS_RAW, NIFTY_DATA, CONFIGS_DEF are small enough to inline safely.
 // ALL_ROWS and TRADE_OHLC are fetched from separate JSON files at runtime.
