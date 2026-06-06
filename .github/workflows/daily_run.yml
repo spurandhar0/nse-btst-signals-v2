@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '30 11 * * 1-5'   # 5:00 PM IST = 11:30 UTC Mon-Fri
   workflow_dispatch:
+    inputs:
+      bhavcopy_url:
+        description: 'Custom bhavcopy URL (leave empty to fetch from NSE automatically)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -28,7 +33,17 @@ jobs:
         run: pip install pandas numpy requests pyarrow openpyxl
 
       - name: Download today's bhavcopy
-        run: python src/nse_bhavcopy_fetch.py
+        env:
+          BHAVCOPY_URL: ${{ github.event.inputs.bhavcopy_url }}
+        run: |
+          if [ -n "$BHAVCOPY_URL" ]; then
+            echo "Using custom bhavcopy URL: $BHAVCOPY_URL"
+            mkdir -p bhav_data
+            DATE=$(date +%Y-%m-%d)
+            curl -fsSL "$BHAVCOPY_URL" -o "bhav_data/${DATE}.csv" && echo "Downloaded from custom URL" || { echo "Custom URL download failed"; exit 1; }
+          else
+            python src/nse_bhavcopy_fetch.py
+          fi
 
       - name: Step 1 - Consolidate bhavcopy data
         run: python src/01_consolidate_csv.py
