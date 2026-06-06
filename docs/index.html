@@ -181,7 +181,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <div class="lg-logo">&#128202; NSE BTST Dashboard</div>
     <div class="lg-sub">Secure access &mdash; enter your credentials</div>
     <div class="lg-field">
-      <input type="text" id="lg-user" placeholder="Username" autocomplete="username"
+      <input type="text" id="lg-user" placeholder="Username" value="admin" autocomplete="username"
              onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()" />
     </div>
     <div class="lg-field">
@@ -191,6 +191,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
     <button class="btn-login" id="lg-btn" onclick="_doLogin()">Sign In &#8594;</button>
     <div class="lg-err" id="lg-err"></div>
+    <div class="lg-hint" style="font-size:11px;color:#888;text-align:center;margin-top:6px;margin-bottom:-4px;">Default username: <b>admin</b></div>
     <div class="lg-footer">NSE BTST Signals &mdash; Private Dashboard</div>
   </div>
 </div>
@@ -2224,8 +2225,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 
   /* ── Helpers ────────────────────────────────────────────────── */
   function _getUsers(){
-    try{ return JSON.parse(localStorage.getItem('_lg_users')||'null')||_BUILTIN; }
-    catch(e){ return _BUILTIN; }
+    try{
+      var stored=JSON.parse(localStorage.getItem('_lg_users')||'null');
+      if(!stored) return _BUILTIN;
+      var merged=stored.slice();
+      _BUILTIN.forEach(function(b){
+        if(!merged.find(function(x){ return x.u===b.u; })) merged.unshift(b);
+      });
+      return merged;
+    }catch(e){ return _BUILTIN; }
   }
   function _saveUsers(arr){ localStorage.setItem('_lg_users',JSON.stringify(arr)); }
 
