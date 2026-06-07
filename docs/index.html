@@ -3244,7 +3244,18 @@ function exportHistCard(btn,name){
 
 // ─── EXPORTS ─────────────────────────────────────────────────────────────────
 function exportTab(tab){
-  const rows=getFiltered(tab);
+  let rows=getFiltered(tab);
+  if(['uniopen','unifno','uniclosed','unifnoclosed'].includes(tab)){
+    rows=rows.map(r=>{
+      const cols={'#':rows.indexOf(r)+1,'CONFIG':r.CONFIG,'SYMBOL':r.SYMBOL,'SIGNAL_DATE':r.SIGNAL_DATE,'SIGNAL_CLOSE':r.SIGNAL_CLOSE,'CURRENT_LTP':r.CURRENT_LTP,'BUY_COUNT':r.BUY_COUNT,'AVG_BUY_PRICE':r.AVG_BUY_PRICE,'TOTAL_QTY':r.TOTAL_QTY,'TOTAL_INVESTMENT':r.TOTAL_INVESTMENT,'TARGET_PRICE':r.TARGET_PRICE,'STOP_PRICE':r.STOP_PRICE,'MARKET_DAYS':r.MARKET_DAYS,'PROFIT':r.PROFIT,'GAIN_PCT':r.GAIN_PCT};
+      const s=parseFloat(r.SIGNAL_CLOSE)||0;
+      cols['Buy1']=+(s).toFixed(2);
+      cols['Buy2']=+(s*0.9).toFixed(2);
+      cols['Buy3']=+(s*0.855).toFixed(2);
+      cols['Buy4']=+(s*0.7695).toFixed(2);
+      return cols;
+    });
+  }
   if(!rows.length){toast('No data','info');return;}
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.json_to_sheet(rows);
@@ -3253,7 +3264,18 @@ function exportTab(tab){
   toast('Excel downloaded!','success');
 }
 function exportCSVTab(tab){
-  const rows=getFiltered(tab);
+  let rows=getFiltered(tab);
+  if(['uniopen','unifno','uniclosed','unifnoclosed'].includes(tab)){
+    rows=rows.map(r=>{
+      const cols={'#':rows.indexOf(r)+1,'CONFIG':r.CONFIG,'SYMBOL':r.SYMBOL,'SIGNAL_DATE':r.SIGNAL_DATE,'SIGNAL_CLOSE':r.SIGNAL_CLOSE,'CURRENT_LTP':r.CURRENT_LTP,'BUY_COUNT':r.BUY_COUNT,'AVG_BUY_PRICE':r.AVG_BUY_PRICE,'TOTAL_QTY':r.TOTAL_QTY,'TOTAL_INVESTMENT':r.TOTAL_INVESTMENT,'TARGET_PRICE':r.TARGET_PRICE,'STOP_PRICE':r.STOP_PRICE,'MARKET_DAYS':r.MARKET_DAYS,'PROFIT':r.PROFIT,'GAIN_PCT':r.GAIN_PCT};
+      const s=parseFloat(r.SIGNAL_CLOSE)||0;
+      cols['Buy1']=+(s).toFixed(2);
+      cols['Buy2']=+(s*0.9).toFixed(2);
+      cols['Buy3']=+(s*0.855).toFixed(2);
+      cols['Buy4']=+(s*0.7695).toFixed(2);
+      return cols;
+    });
+  }
   if(!rows.length){toast('No data','info');return;}
   const keys=Object.keys(rows[0]);
   const csv=[keys.join(','),...rows.map(r=>keys.map(k=>`"${r[k]!=null?r[k]:''}"`)
