@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <title>PS Market — NSE BTST Signals</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-window.onload = function(){ initCfgModal(); loadAllData(); };
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--navy:#0d1f3c;--navy2:#162847;--blue:#1d4ed8;--blue2:#2563eb;--cyan:#0891b2;--cyan2:#06b6d4;
   --green:#059669;--red:#dc2626;--amber:#d97706;--surface:#fff;--surface2:#f1f5f9;--surface3:#e2e8f0;
@@ -140,63 +138,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 .fo-badge{background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;white-space:nowrap}
 
 
-/* ── LOGIN GATE ─────────────────────────────────── */
-
-#login-gate.hidden{display:none;}
-.lg-box{background:#fff;border-radius:18px;padding:40px 44px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;position:relative;}
-.lg-logo{font-size:26px;font-weight:900;color:#0d1f3c;letter-spacing:-0.5px;margin-bottom:4px;}
-.lg-sub{font-size:13px;color:#64748b;margin-bottom:28px;}
-.lg-field{position:relative;margin-bottom:14px;}
-.lg-field input{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:9px;border:1.5px solid #e2e8f0;font-size:15px;transition:border-color .2s;outline:none;}
-.lg-field input:focus{border-color:#2563eb;}
-
-.lg-eye:hover{color:#2563eb;}
-
-
-
-.lg-err{color:#dc2626;font-size:13px;margin-top:10px;min-height:18px;font-weight:500;}
-.lg-footer{margin-top:20px;font-size:11px;color:#94a3b8;}
-/* progress bar */
-#lg-progress{position:fixed;top:0;left:0;width:0;height:4px;background:linear-gradient(90deg,#2563eb,#10b981);z-index:100000;transition:width .4s ease;border-radius:0 2px 2px 0;}
-<!-- user mgmt removed -->
 </head>
 <body>
-
-<!-- ── LOGIN GATE ── -->
-<div id="lg-progress"></div>
-    <div class="lg-sub">Secure access &mdash; enter your credentials</div>
-    <div class="lg-field">
-      <input type="text" id="lg-user" placeholder="Username" value="admin" autocomplete="username"
-             onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()" />
-    </div>
-    <div class="lg-field">
-      <input type="password" id="lg-pass" placeholder="Password" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')_doLogin()" />
-      <span class="lg-eye" id="lg-eye" onclick="_toggleEye()" title="Show/Hide password">&#128065;</span>
-    </div>
-    <button class="btn-login" id="lg-btn" onclick="_doLogin()">Sign In &#8594;</button>
-    <div class="lg-err" id="lg-err"></div>
-    <div class="lg-hint" style="font-size:11px;color:#888;text-align:center;margin-top:6px;margin-bottom:-4px;">Default username: <b>admin</b></div>
-    <div class="lg-footer">NSE BTST Signals &mdash; Private Dashboard</div>
-  </div>
-</div>
-
-<!-- ── USER MANAGEMENT MODAL (admin only) ── -->
-<div id="ums-modal" class="hidden">
-  <div class="ums-box">
-    <button class="ums-close" onclick="document.getElementById('ums-modal').classList.add('hidden')">&#x2715; Close</button>
-    <h3>&#128100; Manage Users</h3>
-    <div class="ums-row">
-      <input type="text" id="ums-uname" placeholder="New username" />
-      <input type="password" id="ums-pwd" placeholder="Password" />
-      <button class="ums-add" onclick="_umsAdd()">+ Add</button>
-    </div>
-    <table class="ums-table" id="ums-tbl">
-      <thead><tr><th>#</th><th>Username</th><th>Role</th><th></th></tr></thead>
-      <tbody id="ums-tbody"></tbody>
-    </table>
-  </div>
-</div>
 
 <header>
   <div class="hdr">
@@ -1512,131 +1455,6 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 
 <script>
 
-/* ═══════════════════════════════════════════════
-   LOGIN GATE  —  multi-user, session-based
-   ═══════════════════════════════════════════════ */
-(function(){
-  /* ── Default users (username → btoa(password)) ─────────────────
-     Add extra entries here; they are the built-in fallback.
-     Runtime additions are stored in localStorage under _lg_users.  */
-  var _BUILTIN = [
-    {u:'admin',    p:btoa('NSE@BTST#2024'), role:'admin'},
-    {u:'viewer',   p:btoa('View@2024'),     role:'viewer'}
-  ];
-
-  /* ── Helpers ────────────────────────────────────────────────── */
-  function _getUsers(){
-    try{
-      var stored=JSON.parse(localStorage.getItem('_lg_users')||'null');
-      if(!stored) return _BUILTIN;
-      var merged=stored.slice();
-      _BUILTIN.forEach(function(b){
-        if(!merged.find(function(x){ return x.u===b.u; })) merged.unshift(b);
-      });
-      return merged;
-    }catch(e){ return _BUILTIN; }
-  }
-  function _saveUsers(arr){ localStorage.setItem('_lg_users',JSON.stringify(arr)); }
-
-  /* ── Check session ──────────────────────────────────────────── */
-  var _sess = sessionStorage.getItem('_lg_ok');
-  if(_sess){
-    var gate=document.getElementById('login-gate');
-    if(gate) gate.classList.add('hidden');
-    /* show manage-users button if admin */
-    try{
-      var info=JSON.parse(_sess);
-      if(info && info.role==='admin') _injectAdminBtn();
-    }catch(e){}
-  }
-
-  /* ── Main login ─────────────────────────────────────────────── */
-  window._doLogin = function(){
-    var u=(document.getElementById('lg-user').value||'').trim();
-    var p=(document.getElementById('lg-pass').value||'');
-    var err=document.getElementById('lg-err');
-    var btn=document.getElementById('lg-btn');
-    if(!u||!p){ err.textContent='Please enter username and password.'; return; }
-
-    var users=_getUsers();
-    var match=users.find(function(x){ return x.u===u && x.p===btoa(p); });
-    if(!match){ err.textContent='Invalid username or password.'; document.getElementById('lg-pass').value=''; document.getElementById('lg-pass').focus(); return; }
-
-    /* ── SUCCESS: show progress bar ─────────────────────────── */
-    err.textContent='';
-    btn.disabled=true; btn.textContent='Signing in…';
-    var bar=document.getElementById('lg-progress');
-    bar.style.width='20%';
-    setTimeout(function(){ bar.style.width='55%'; },300);
-    setTimeout(function(){ bar.style.width='80%'; },700);
-    setTimeout(function(){
-      bar.style.width='100%';
-      setTimeout(function(){
-        sessionStorage.setItem('_lg_ok', JSON.stringify({u:match.u, role:match.role}));
-        var gate=document.getElementById('login-gate');
-        if(gate) gate.classList.add('hidden');
-        bar.style.width='0';
-        btn.disabled=false; btn.textContent='Sign In \u2192';
-        if(match.role==='admin') _injectAdminBtn();
-      },350);
-    },1200);
-  };
-
-  /* ── Eye toggle ─────────────────────────────────────────────── */
-  window._toggleEye = function(){
-    var inp=document.getElementById('lg-pass');
-    var eye=document.getElementById('lg-eye');
-    if(inp.type==='password'){ inp.type='text'; eye.innerHTML='&#128064;'; }
-    else { inp.type='password'; eye.innerHTML='&#128065;'; }
-  };
-
-  /* ── Admin "Manage Users" button ─────────────────────────────── */
-  function _injectAdminBtn(){
-    if(document.getElementById('_ums-btn')) return;
-    var btn=document.createElement('button');
-    btn.id='_ums-btn';
-    btn.title='Manage Users';
-    btn.innerHTML='&#128100; Users';
-    btn.style.cssText='position:fixed;bottom:18px;right:18px;z-index:50000;background:#0d1f3c;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);';
-    btn.onclick=_umsOpen;
-    document.body.appendChild(btn);
-  }
-
-  /* ── User management ─────────────────────────────────────────── */
-  window._umsOpen = function(){
-    _umsRender();
-    document.getElementById('ums-modal').classList.remove('hidden');
-  };
-  window._umsAdd = function(){
-    var u=(document.getElementById('ums-uname').value||'').trim();
-    var p=(document.getElementById('ums-pwd').value||'').trim();
-    if(!u||!p){ alert('Both username and password are required.'); return; }
-    var users=_getUsers();
-    if(users.find(function(x){ return x.u===u; })){ alert('Username already exists.'); return; }
-    users.push({u:u, p:btoa(p), role:'viewer'});
-    _saveUsers(users);
-    document.getElementById('ums-uname').value='';
-    document.getElementById('ums-pwd').value='';
-    _umsRender();
-  };
-  window._umsDel = function(uname){
-    var sess=JSON.parse(sessionStorage.getItem('_lg_ok')||'{}');
-    if(sess.u===uname){ alert("You cannot delete your own account."); return; }
-    if(!confirm('Delete user "'+uname+'"?')) return;
-    var users=_getUsers().filter(function(x){ return x.u!==uname; });
-    _saveUsers(users);
-    _umsRender();
-  };
-  function _umsRender(){
-    var tbody=document.getElementById('ums-tbody');
-    if(!tbody) return;
-    var users=_getUsers();
-    tbody.innerHTML=users.map(function(u,i){
-      return '<tr><td>'+(i+1)+'</td><td><b>'+u.u+'</b></td><td>'+u.role+'</td>'
-        +'<td><button class="ums-del" onclick="_umsDel(\''+u.u+'\')">&#x1F5D1;</button></td></tr>';
-    }).join('');
-  }
-})();
 
 
 // ─── DATA — loaded asynchronously to keep index.html small ────────────────────
@@ -1650,83 +1468,6 @@ let ALL_ROWS   = [];
 let TRADE_OHLC = {};
 let _dataReady = false;
 
-(async function loadData() {
-  // Show a non-blocking loading indicator
-  const banner = document.getElementById('liveBanner');
-  const origBanner = banner ? banner.innerHTML : '';
-  if (banner) banner.innerHTML = '&#8987; Loading trade data&hellip;';
-
-  try {
-    // Fetch only SELECTED config files + trade_ohlc in parallel
-    // Load saved config filter first
-    _cfgTabActive = CONFIGS_DEF.map(c => c.id).join(',');
-    const allResults = await Promise.all(allFetches);
-
-    // Process per-config sim files — merge all signals into ALL_ROWS
-    let totalSignals = 0;
-    for (let i = 0; i < configIds.length; i++) {
-      const res = allResults[i];
-      const cid = configIds[i];
-      if (!res.ok) { console.warn('sim_results_' + cid + '.json not found (' + res.status + ')'); continue; }
-      const data = await res.json();
-      const signals = data.signals || [];
-      for (const r of signals) {
-        ALL_ROWS.push(r);
-        totalSignals++;
-      }
-    }
-
-    if (totalSignals === 0) {
-      if (banner) banner.innerHTML =
-        '<span style="color:#d97706">&#9888; No trade data found yet. Run the Generate Signal workflow first.</span>';
-      _dataReady = true;
-      // Load saved config filter from localStorage
-    _cfgTabActive = CONFIGS_DEF.map(c => c.id).join(',');
-      });
-    }
-    
-
-      buildOverview();
-      return;
-    }
-
-    // Process trade_ohlc (combined file, MTF filtered)
-    const ohlcRes = allResults[configIds.length];
-    if (ohlcRes.ok) {
-      TRADE_OHLC = await ohlcRes.json();
-    }
-
-    _dataReady = true;
-    if (banner) banner.innerHTML = origBanner;
-
-    // Dynamically update Data date from sim_meta.json (bhavcopy date)
-    try {
-      const metaRes = await fetch('data/sim_meta.json');
-      if (metaRes.ok) {
-        const simMeta = await metaRes.json();
-        const ddEl = document.getElementById('bannerDataDate');
-        if (ddEl && simMeta.last_date) ddEl.textContent = simMeta.last_date;
-        const bdEl = document.getElementById('bannerDate');
-        if (bdEl && simMeta.generated_at) bdEl.textContent = simMeta.generated_at;
-      }
-    } catch(e) { /* sim_meta fetch failed — keep static baked-in values */ }
-
-    // Rebuild open-position helpers
-    openSymbols.clear();
-    for (const k of Object.keys(openMap)) delete openMap[k];
-    ALL_ROWS.filter(r => r.ORDER === 'Executed' && r.STATUS === 'Open').forEach(r => {
-      openSymbols.add(r.SYMBOL);
-      if (!openMap[r.SYMBOL]) openMap[r.SYMBOL] = parseFloat(r.CURRENT_LTP) || 0;
-    });
-
-    buildOverview();
-  } catch (err) {
-    console.error('Dashboard data load failed:', err);
-    if (banner) banner.innerHTML =
-      '<span style="color:#dc2626">&#9888; Failed to load trade data: ' + err.message +
-      ' &mdash; check docs/data/ in your repo.</span>';
-  }
-})();
 
 // ─── OPEN POSITION MAPS (populated after data loads) ─────────────────────────
 const openSymbols = new Set();
@@ -3943,120 +3684,127 @@ async function portfolioManualAdd() {
 
 
 
-// ─── CONFIGS TAB SELECT POPUP ──────────────────────────────────────────────────
-var _cfgSelTemp = new Set(); // temporary selection while modal is open
-var _cfgTabActive = 'ALL';  // current applied filter for configs tab
+// ─── CONFIGS TAB SELECT POPUP ─────────────────────────────────────────────────
+var _cfgSelTemp = new Set();
+var _cfgTabActive = 'ALL';
 
-);
-  else _cfgTabActive.split(',').forEach(function(id){_cfgSelTemp.add(id.trim());});
+function openCfgSelectModal(){
+  _cfgSelTemp = new Set();
+  var saved = localStorage.getItem('btst_cfg_active_v2');
+  if(!saved || saved === 'ALL'){
+    CONFIGS_DEF.forEach(function(c){ _cfgSelTemp.add(c.id); });
+  } else {
+    saved.split(',').forEach(function(id){ _cfgSelTemp.add(id.trim()); });
+  }
   updateCfgSelGrid();
-  var m=document.getElementById('cfg-select-modal');
-  m.style.display='flex';
+  var m = document.getElementById('cfg-select-modal');
+  if(m){ m.style.display='flex'; }
+}
+function closeCfgSelectModal(){
+  var m = document.getElementById('cfg-select-modal');
+  if(m){ m.style.display='none'; }
 }
 function updateCfgSelGrid(){
-  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
+  var allBtns = Array.from(document.querySelectorAll('.cfg-sel-btn'));
   allBtns.forEach(function(b){
-    var sel=_cfgSelTemp.has(b.dataset.id);
-    b.style.background=sel?'var(--navy)':'transparent';
-    b.style.color=sel?'#fff':'var(--text2)';
-    b.style.borderColor=sel?'var(--navy)':'var(--border)';
+    var sel = _cfgSelTemp.has(b.dataset.id);
+    b.style.background = sel ? 'var(--navy)' : 'transparent';
+    b.style.color = sel ? '#fff' : 'var(--text2)';
+    b.style.borderColor = sel ? 'var(--navy)' : 'var(--border)';
   });
-  var count=_cfgSelTemp.size;
-  var total=allBtns.length;
-  document.getElementById('cfg-sel-count').textContent=count+' of '+total+' selected';
+  var count = _cfgSelTemp.size;
+  var total = allBtns.length;
+  var el = document.getElementById('cfg-sel-count');
+  if(el) el.textContent = count + ' of ' + total + ' selected';
 }
-).join('');
-}
-);
+function cfgSelToggle(id){
+  if(_cfgSelTemp.has(id)) _cfgSelTemp.delete(id);
+  else _cfgSelTemp.add(id);
   updateCfgSelGrid();
 }
+function cfgSelAll(){ CONFIGS_DEF.forEach(function(c){ _cfgSelTemp.add(c.id); }); updateCfgSelGrid(); }
+function cfgSelClear(){ _cfgSelTemp.clear(); updateCfgSelGrid(); }
+
 function applyCfgSelect(){
-  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
-  var allIds=allBtns.map(function(b){return b.dataset.id;});
-  if(_cfgSelTemp.size===0||_cfgSelTemp.size===allIds.length){
-    _cfgTabActive='ALL';
-  } else if(_cfgSelTemp.size===1){
-    _cfgTabActive=Array.from(_cfgSelTemp)[0];
+  var allIds = CONFIGS_DEF.map(function(c){ return c.id; });
+  if(_cfgSelTemp.size === 0 || _cfgSelTemp.size === allIds.length){
+    _cfgTabActive = 'ALL';
+  } else if(_cfgSelTemp.size === 1){
+    _cfgTabActive = Array.from(_cfgSelTemp)[0];
   } else {
-    _cfgTabActive=Array.from(_cfgSelTemp).join(',');
+    _cfgTabActive = Array.from(_cfgSelTemp).join(',');
   }
-  
-  // Persist to localStorage
-  localStorage.setItem('btst_cfg_active_v2',_cfgTabActive);
-  
-  
+  localStorage.setItem('btst_cfg_active_v2', _cfgTabActive);
   closeCfgSelectModal();
-  
-  // RELOAD DATA for selected configs
-  
+  reloadDataForConfigs();
 }
 
-;
-  
-  // Parse selected configs
-  var configIds=[];
-  if(_cfgTabActive==='ALL'){
-    configIds=CONFIGS_DEF.map(c=>c.id);
+function reloadDataForConfigs(){
+  ALL_ROWS = [];
+  var banner = document.getElementById('liveBanner');
+  if(banner) banner.innerHTML = '&#8987; Loading trade data&hellip;';
+  var configIds = [];
+  if(_cfgTabActive === 'ALL'){
+    configIds = CONFIGS_DEF.map(function(c){ return c.id; });
   } else {
-    configIds=_cfgTabActive.split(',').filter(id=>id.trim()!=='');
+    configIds = _cfgTabActive.split(',').filter(function(id){ return id.trim() !== ''; });
   }
-  
-  // Fetch selected configs
   (async function(){
     try{
-      var allFetches=[
-        ...configIds.map(cid=>fetch('data/sim_results_'+cid+'.json')),
+      var allFetches = [
+        ...configIds.map(function(cid){ return fetch('data/sim_results_'+cid+'.json'); }),
         fetch('data/trade_ohlc.json'),
       ];
-      var allResults=await Promise.all(allFetches);
-      
-      // Process per-config files
-      var totalSignals=0;
-      for(var i=0;i<configIds.length;i++){
-        var res=allResults[i];
-        var cid=configIds[i];
-        if(!res.ok){console.warn('sim_results_'+cid+'.json not found');continue;}
-        var data=await res.json();
-        var signals=data.signals||[];
-        for(var r of signals){
-          ALL_ROWS.push(r);
-          totalSignals++;
-        }
+      var allResults = await Promise.all(allFetches);
+      var totalSignals = 0;
+      for(var i = 0; i < configIds.length; i++){
+        var res = allResults[i];
+        var cid = configIds[i];
+        if(!res.ok){ console.warn('sim_results_'+cid+'.json not found'); continue; }
+        var data = await res.json();
+        var signals = data.signals || [];
+        for(var r of signals){ ALL_ROWS.push(r); totalSignals++; }
       }
-      
-      // Process trade_ohlc
-      var ohlcRes=allResults[configIds.length];
-      if(ohlcRes.ok) TRADE_OHLC=await ohlcRes.json();
-      
-      _dataReady=true;
-      if(banner) banner.innerHTML='✓ Last simulation: 07-Jun-2026 22:13 IST | Data date: 2026-06-05';
-      
-      // Reset all tabs and rebuild
-      var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
-      tabList.forEach(function(t){
-        if(!state[t]) state[t]={};
-        state[t].page=1;
+      var ohlcRes = allResults[configIds.length];
+      if(ohlcRes.ok) TRADE_OHLC = await ohlcRes.json();
+      _dataReady = true;
+      try{
+        var metaRes = await fetch('data/sim_meta.json');
+        if(metaRes.ok){
+          var simMeta = await metaRes.json();
+          var ddEl = document.getElementById('bannerDataDate');
+          if(ddEl && simMeta.last_date) ddEl.textContent = simMeta.last_date;
+          var bdEl = document.getElementById('bannerDate');
+          if(bdEl && simMeta.generated_at) bdEl.textContent = simMeta.generated_at;
+        }
+      } catch(e){}
+      openSymbols.clear();
+      for(var k of Object.keys(openMap)) delete openMap[k];
+      ALL_ROWS.filter(function(r){ return r.ORDER === 'Executed' && r.STATUS === 'Open'; }).forEach(function(r){
+        openSymbols.add(r.SYMBOL);
+        if(!openMap[r.SYMBOL]) openMap[r.SYMBOL] = parseFloat(r.CURRENT_LTP) || 0;
       });
-      
+      var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
+      tabList.forEach(function(t){ if(!state[t]) state[t]={}; state[t].page=1; });
       buildOverview();
       renderConfigsPage();
-      
-      // Re-render current visible tab
-      var activeTab=document.querySelector('.tab.active');
-      if(activeTab){
-        var tabName=activeTab.getAttribute('data-tab');
-        if(tabName) renderTab(tabName);
-      }
+      var activeTab = document.querySelector('.tab.active');
+      if(activeTab){ var tabName = activeTab.getAttribute('data-tab'); if(tabName) renderTab(tabName); }
+      if(banner) banner.innerHTML = totalSignals > 0 
+        ? '&#10003; Data loaded: ' + totalSignals + ' signals'
+        : '<span style="color:#d97706">&#9888; No trade data found. Run the Generate Signal workflow first.</span>';
     }catch(err){
-      console.error('Data reload failed:',err);
-      if(banner) banner.innerHTML='<span style="color:#dc2626">Error loading configs: '+err.message+'</span>';
+      console.error('Data reload failed:', err);
+      if(banner) banner.innerHTML = '<span style="color:#dc2626">&#9888; Error loading data: '+err.message+'</span>';
     }
   })();
 }
 
-
-// Config UI removed - auto-loads from CONFIGS_DEF in params.json
-
+document.addEventListener('DOMContentLoaded', function(){
+  var saved = localStorage.getItem('btst_cfg_active_v2');
+  if(saved) _cfgTabActive = saved;
+  reloadDataForConfigs();
+});
 
 function buildCfgParamsRows(){
   if(!CONFIGS_DEF||!CONFIGS_DEF.length) return '<tr><td colspan="11" class="empty">No configs loaded.</td></tr>';
@@ -4245,15 +3993,7 @@ function applyCfgSelection(){
 }
 
 
-window.onload = function(){ initCfgModal(); loadAllData(); };
 </script>
-<!-- CONFIG SELECTION MODAL -->
-<div id="cfg-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;">
-  <div style="background:#fff;border-radius:12px;padding:30px;max-width:600px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-    <h2 style="margin:0 0 20px 0;color:#0d1f3c;font-size:20px;font-weight:700;">Select Configurations</h2>
-    <div id="cfg-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:20px 0;">
-      <!-- checkboxes generated here -->
-    </div>
     <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
       <button onclick="selectAllCfgs()" style="padding:10px 20px;border:1px solid #ccc;background:#f5f5f5;border-radius:6px;cursor:pointer;font-weight:600;">Select All</button>
       <button onclick="clearAllCfgs()" style="padding:10px 20px;border:1px solid #ccc;background:#f5f5f5;border-radius:6px;cursor:pointer;font-weight:600;">Clear All</button>
