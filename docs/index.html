@@ -980,7 +980,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <button class="btn-green btn-sm" onclick="exportTab('signals')">&#8595; Excel</button>
     <button class="btn-teal btn-sm" onclick="exportCSVTab('signals')">&#8595; CSV</button>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-    <button class="btn-cfg-open" onclick="openConfigModal()">&#9881; Configs &nbsp;<span class="cfg-sel-badge" style="font-weight:400;opacity:.85">All</span></button>
+    <button class="btn-cfg-open" onclick="buildCfgSelGrid();openCfgSelectModal();">&#9881; Configs &nbsp;<span class="cfg-sel-badge" id="top-cfg-badge" style="font-weight:400;opacity:.85">20 CONFIGS</span></button>
   </div>
   <div class="card" style="padding:0 0 8px">
     <div class="table-area">
@@ -4023,6 +4023,7 @@ function applyCfgSelect(){
   renderConfigsPage();
 }
 function updateCfgSelectBtn(){
+  // Update Configs tab button
   var btn=document.getElementById('cfg-select-open-btn');
   if(!btn) return;
   var total=(CONFIGS_DEF||[]).length;
@@ -4031,7 +4032,17 @@ function updateCfgSelectBtn(){
   else if(_cfgTabActive.includes(',')){ var cnt=_cfgTabActive.split(',').length; label='&#9881; Configurations ('+cnt+' of '+total+' selected)'; }
   else label='&#9881; Configurations ('+_cfgTabActive+' only)';
   btn.innerHTML=label;
+  
+  // Update top badge
+  var badge=document.getElementById('top-cfg-badge');
+  if(badge){
+    if(_cfgTabActive==='ALL'||_cfgTabActive==='') badge.innerHTML=total+' CONFIGS';
+    else if(_cfgTabActive.includes(',')){ var cnt=_cfgTabActive.split(',').length; badge.innerHTML=cnt+' CONFIGS'; }
+    else badge.innerHTML='1 CONFIG';
+  }
 }
+
+
 function buildCfgParamsRows(){
   if(!CONFIGS_DEF||!CONFIGS_DEF.length) return '<tr><td colspan="11" class="empty">No configs loaded.</td></tr>';
   return CONFIGS_DEF.map(function(c){
