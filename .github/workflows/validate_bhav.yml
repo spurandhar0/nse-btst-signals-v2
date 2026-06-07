@@ -33,7 +33,9 @@ permissions:
 jobs:
   validate-and-backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 120   # generous limit — handles 500+ symbols, years of backfill
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    timeout-minutes: 360   # up to 6h — handles 500+ symbols, full historical backfill
 
     steps:
       # ── 1. Checkout ──────────────────────────────────────────────────────

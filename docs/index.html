@@ -750,20 +750,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
         <th onclick="srt('uniopen',2)">SYMBOL</th>
         <th onclick="srt('uniopen',3)">SIGNAL_DATE</th>
         <th onclick="srt('uniopen',4)">SIGNAL_CLOSE</th>
-        <th onclick="srt('uniopen',5)">CHG_1D</th>
-        <th onclick="srt('uniopen',6)">PCT_FROM_LOW</th>
-        <th onclick="srt('uniopen',7)">MIN_5D_LOW</th>
-        <th onclick="srt('uniopen',8)">MIN_5D_DATE</th>
-        <th onclick="srt('uniopen',9)">CURRENT_LTP</th>
-        <th onclick="srt('uniopen',10)">BUY_COUNT</th>
-        <th onclick="srt('uniopen',11)">AVG_BUY_PRICE</th>
-        <th onclick="srt('uniopen',12)">TOTAL_QTY</th>
-        <th onclick="srt('uniopen',13)">TOTAL_INVESTMENT</th>
-        <th onclick="srt('uniopen',14)">TARGET_PRICE</th>
-        <th onclick="srt('uniopen',15)">STOP_PRICE</th>
-        <th onclick="srt('uniopen',16)">MARKET_DAYS</th>
-        <th onclick="srt('uniopen',17)">PROFIT</th>
-        <th onclick="srt('uniopen',18)">GAIN_PCT</th>
+        <th onclick="srt('uniopen',5)">CURRENT_LTP</th>
+        <th onclick="srt('uniopen',6)">BUY_COUNT</th>
+        <th onclick="srt('uniopen',7)">AVG_BUY_PRICE</th>
+        <th onclick="srt('uniopen',8)">TOTAL_QTY</th>
+        <th onclick="srt('uniopen',9)">TOTAL_INVESTMENT</th>
+        <th onclick="srt('uniopen',10)">TARGET_PRICE</th>
+        <th onclick="srt('uniopen',11)">STOP_PRICE</th>
+        <th onclick="srt('uniopen',12)">MARKET_DAYS</th>
+        <th onclick="srt('uniopen',13)">PROFIT</th>
+        <th onclick="srt('uniopen',14)">GAIN_PCT</th>
         <th>Buy1</th>
         <th>Buy2</th>
         <th>Buy3</th>
@@ -840,20 +836,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
         <th onclick="srt('unifno',2)">SYMBOL</th>
         <th onclick="srt('unifno',3)">SIGNAL_DATE</th>
         <th onclick="srt('unifno',4)">SIGNAL_CLOSE</th>
-        <th onclick="srt('unifno',5)">CHG_1D</th>
-        <th onclick="srt('unifno',6)">PCT_FROM_LOW</th>
-        <th onclick="srt('unifno',7)">MIN_5D_LOW</th>
-        <th onclick="srt('unifno',8)">MIN_5D_DATE</th>
-        <th onclick="srt('unifno',9)">CURRENT_LTP</th>
-        <th onclick="srt('unifno',10)">BUY_COUNT</th>
-        <th onclick="srt('unifno',11)">AVG_BUY_PRICE</th>
-        <th onclick="srt('unifno',12)">TOTAL_QTY</th>
-        <th onclick="srt('unifno',13)">TOTAL_INVESTMENT</th>
-        <th onclick="srt('unifno',14)">TARGET_PRICE</th>
-        <th onclick="srt('unifno',15)">STOP_PRICE</th>
-        <th onclick="srt('unifno',16)">MARKET_DAYS</th>
-        <th onclick="srt('unifno',17)">PROFIT</th>
-        <th onclick="srt('unifno',18)">GAIN_PCT</th>
+        <th onclick="srt('unifno',5)">CURRENT_LTP</th>
+        <th onclick="srt('unifno',6)">BUY_COUNT</th>
+        <th onclick="srt('unifno',7)">AVG_BUY_PRICE</th>
+        <th onclick="srt('unifno',8)">TOTAL_QTY</th>
+        <th onclick="srt('unifno',9)">TOTAL_INVESTMENT</th>
+        <th onclick="srt('unifno',10)">TARGET_PRICE</th>
+        <th onclick="srt('unifno',11)">STOP_PRICE</th>
+        <th onclick="srt('unifno',12)">MARKET_DAYS</th>
+        <th onclick="srt('unifno',13)">PROFIT</th>
+        <th onclick="srt('unifno',14)">GAIN_PCT</th>
         <th>Buy1</th>
         <th>Buy2</th>
         <th>Buy3</th>
@@ -2635,12 +2627,12 @@ function getTabSortVals(tab,a,b,col){
   const nv=x=>parseFloat(x)||0;
   const sv=x=>x||'';
   if(tab==='uniopen'||tab==='unifno'){
-    const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','SIGNAL_CLOSE','CHG_1D','PCT_FROM_LOW','MIN_5D_LOW','MIN_5D_DATE','CURRENT_LTP','BUY_COUNT','AVG_BUY_PRICE','TOTAL_QTY','TOTAL_INVESTMENT','TARGET_PRICE','STOP_PRICE','MARKET_DAYS','PROFIT','GAIN_PCT'];
+    const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','SIGNAL_CLOSE','CURRENT_LTP','BUY_COUNT','AVG_BUY_PRICE','TOTAL_QTY','TOTAL_INVESTMENT','TARGET_PRICE','STOP_PRICE','MARKET_DAYS','PROFIT','GAIN_PCT'];
     const k=cols[col]||'SYMBOL';
     if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
     return[nv(a[k]),nv(b[k])];
   }
-  if(tab==='open'||tab==='fno'||tab==='uniopen'||tab==='unifno'){
+  if(tab==='open'||tab==='fno'){
     const cols=[0,'CONFIG','SYMBOL','SIGNAL_DATE','AVG_BUY_PRICE','CURRENT_LTP','TARGET_PRICE','STOP_PRICE','BUY_COUNT','TOTAL_QTY','TOTAL_INVESTMENT','MARKET_DAYS','PROFIT','GAIN_PCT'];
     const k=cols[col]||'SYMBOL';
     if(typeof a[k]==='string')return[sv(a[k]),sv(b[k])];
@@ -2755,6 +2747,28 @@ function rowHTML(tab,r,n){
       <td>&#8377;${fN(r.TOTAL_INVESTMENT)}</td><td>${fI(r.MARKET_DAYS)}</td>
       <td ${pnlColor(r.PROFIT)}>&#8377;${fN(r.PROFIT)}</td>
       <td ${pnlColor(r.GAIN_PCT)}>${gp>=0?'+':''}${f2(r.GAIN_PCT)}%</td>
+    </tr>`;
+  }
+  if(tab==='uniopen'||tab==='unifno'){
+    const pl=parseFloat(r.PROFIT)||0;
+    const gp=parseFloat(r.GAIN_PCT)||0;
+    const bc=parseInt(r.BUY_COUNT||1);
+    const bcHtml=bc>1
+      ?`<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:900;background:linear-gradient(135deg,var(--blue2),var(--cyan2));color:#fff">${bc}x</span>`
+      :`<span style="color:var(--text3)">${bc}</span>`;
+    return `<tr>
+      <td>${n}</td><td>${cfgBadge(r.CONFIG)}</td><td><strong>${r.SYMBOL}</strong>${foTag(r.SYMBOL)}</td>
+      <td>${fD(r.SIGNAL_DATE)}</td>
+      <td>&#8377;${fN(r.SIGNAL_CLOSE)}</td>
+      <td>&#8377;${fN(r.CURRENT_LTP)}</td>
+      <td>${bcHtml}</td>
+      <td>&#8377;${fN(r.AVG_BUY_PRICE)}</td><td>${fI(r.TOTAL_QTY)}</td>
+      <td>&#8377;${fN(r.TOTAL_INVESTMENT)}</td>
+      <td>&#8377;${fN(r.TARGET_PRICE)}</td><td>&#8377;${fN(r.STOP_PRICE)}</td>
+      <td>${fI(r.MARKET_DAYS)}</td>
+      <td ${pnlColor(r.PROFIT)}>&#8377;${fN(r.PROFIT)}</td>
+      <td ${pnlColor(r.GAIN_PCT)}>${gp>=0?'+':''}${f2(r.GAIN_PCT)}%</td>
+      ${(()=>{const s=parseFloat(r.SIGNAL_CLOSE)||0;const b2=+(s*.9).toFixed(2);const b3=+(s*.855).toFixed(2);const b4=+(s*.7695).toFixed(2);const _g='background:rgba(5,150,105,0.38);font-weight:700;';return (bc>=1?'<td style="'+_g+'">':'<td>')+'&#8377;'+fN(s)+'</td>'+(bc>=2?'<td style="'+_g+'">':'<td>')+'&#8377;'+fN(b2)+'</td>'+(bc>=3?'<td style="'+_g+'">':'<td>')+'&#8377;'+fN(b3)+'</td>'+(bc>=4?'<td style="'+_g+'">':'<td>')+'&#8377;'+fN(b4)+'</td>';})()}  
     </tr>`;
   }
   if(tab==='closed'||tab==='fnoclosed'||tab==='uniclosed'||tab==='unifnoclosed'){
