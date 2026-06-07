@@ -1,22 +1,19 @@
 """
-validate_and_backfill.py
-========================
-Scans every NSE trading day from FROM_DATE to today.
-For each day:
-  - Checks if bhav copy CSV exists in bhav_data/
-  - If missing → downloads from NSE archives (no cookies needed)
-  - Validates that every symbol in our known-symbols list has OHLC data
-  - Fills any per-symbol gaps from NSE historical API
+validate_and_backfill.py (OPTIMIZED)
+====================================
+FAST MODE: Only validate symbols from actual trading signals, skip MTF watchlist.
+
+Scans missing bhav copies and backfills OHLC gaps for CONFIG SYMBOLS ONLY.
+Ignores MTF watchlist — validates only symbols that appear in sim_results_C*.json.
 
 SELF-CONTAINED: zero external tokens, zero third-party APIs.
-Survives NSE website changes because it tries multiple URL formats.
 
 Usage (GitHub Actions env vars):
   FROM_DATE      = "2025-01-01"    (default)
   FORCE_RECHECK  = "false"         (set true to re-validate already-present files)
 """
 
-import os, io, glob, time, zipfile, logging, requests, random
+import os, io, glob, time, zipfile, logging, requests, random, json
 import pandas as pd
 from datetime import date, timedelta, datetime, timezone
 from pathlib import Path
@@ -41,26 +38,14 @@ log = logging.getLogger(__name__)
 BHAV_ROOT.mkdir(exist_ok=True)
 DB_ROOT.mkdir(exist_ok=True)
 
-# ── NSE 2025–2026 Trading Holidays (BSE & NSE match) ─────────────────────────
-# Updated annually — hardcoded avoids dependency on any API
+# ── NSE 2025–2026 Trading Holidays ───────────────────────────────────────────
 NSE_HOLIDAYS = {
-    # 2025
-    date(2025, 1, 26),   # Republic Day
-    date(2025, 2, 26),   # Mahashivratri
-    date(2025, 3, 14),   # Holi
-    date(2025, 3, 31),   # Eid ul-Fitr
-    date(2025, 4, 14),   # Dr. Ambedkar Jayanti
-    date(2025, 4, 18),   # Good Friday
-    date(2025, 5, 1),    # Maharashtra Day
-    date(2025, 8, 15),   # Independence Day
-    date(2025, 8, 27),   # Ganesh Chaturthi
-    date(2025, 10, 2),   # Gandhi Jayanti
-    date(2025, 10, 21),  # Diwali Laxmi Puja
-    date(2025, 10, 22),  # Diwali Balipratipada
-    date(2025, 11, 5),   # Guru Nanak Jayanti
-    date(2025, 12, 25),  # Christmas
-    # 2026 (add as announced)
-    date(2026, 1, 26),   # Republic Day (tentative)
+    date(2025, 1, 26),   date(2025, 2, 26),   date(2025, 3, 14),
+    date(2025, 3, 31),   date(2025, 4, 14),   date(2025, 4, 18),
+    date(2025, 5, 1),    date(2025, 8, 15),   date(2025, 8, 27),
+    date(2025, 10, 2),   date(2025, 10, 21),  date(2025, 10, 22),
+    date(2025, 11, 5),   date(2025, 12, 25),
+    date(2026, 1, 26),
 }
 
 
@@ -78,7 +63,6 @@ def trading_days(start: date, end: date):
         cur += timedelta(days=1)
 
 
-# ── Browser-like session (NSE blocks plain urllib) ────────────────────────────
 def make_session() -> requests.Session:
     s = requests.Session()
     s.headers.update({
@@ -91,7 +75,6 @@ def make_session() -> requests.Session:
         "Accept-Language": "en-US,en;q=0.9",
         "Referer": "https://www.nseindia.com",
     })
-    # Warm up cookies — NSE requires a session cookie for some endpoints
     try:
         s.get("https://www.nseindia.com", timeout=15)
     except Exception:
@@ -99,7 +82,6 @@ def make_session() -> requests.Session:
     return s
 
 
-# ── NSE archive bhav copy URL formats (try all until one works) ──────────────
 def bhav_urls(d: date):
     dd   = d.strftime("%d")
     mm   = d.strftime("%m")
@@ -107,11 +89,8 @@ def bhav_urls(d: date):
     mon3 = d.strftime("%b").upper()
 
     return [
-        # NEW format (2024+) — sec_bhavdata_full_DDMMYYYY.csv (no zip)
         f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{dd}{mm}{yyyy}.csv",
-        # OLD zip format — cm<DD><MON><YYYY>bhav.csv.zip
         f"https://nsearchives.nseindia.com/content/historical/EQUITIES/{yyyy}/{mon3}/cm{dd}{mon3}{yyyy}bhav.csv.zip",
-        # Alternate path
         f"https://www1.nseindia.com/content/historical/EQUITIES/{yyyy}/{mon3}/cm{dd}{mon3}{yyyy}bhav.csv.zip",
     ]
 
@@ -124,18 +103,16 @@ def download_bhav(d: date, session: requests.Session) -> pd.DataFrame | None:
                 log.info(f"  Trying {url} (attempt {attempt})")
                 resp = session.get(url, timeout=30, stream=True)
                 if resp.status_code == 404:
-                    break   # try next URL format
+                    break
                 resp.raise_for_status()
                 content = resp.content
 
-                # Handle zip
                 if url.endswith(".zip"):
                     with zipfile.ZipFile(io.BytesIO(content)) as zf:
                         csv_name = [n for n in zf.namelist() if n.endswith(".csv")][0]
                         content = zf.read(csv_name)
 
                 df = pd.read_csv(io.BytesIO(content) if isinstance(content, bytes) else io.StringIO(content.decode()))
-                # Normalize column names
                 df.columns = [c.strip().upper() for c in df.columns]
                 log.info(f"  ✓ Downloaded {d.isoformat()} — {len(df)} rows")
                 return df
@@ -145,103 +122,52 @@ def download_bhav(d: date, session: requests.Session) -> pd.DataFrame | None:
                 if attempt < MAX_RETRIES:
                     time.sleep(RETRY_WAIT + random.uniform(0, 3))
 
-    log.warning(f"  ✗ Could not download bhav for {d.isoformat()} — all URL formats failed")
+    log.warning(f"  ✗ Could not download bhav for {d.isoformat()}")
     return None
 
 
 def save_bhav(d: date, df: pd.DataFrame):
-    """Save cleaned bhav copy to bhav_data/YYYY-MM-DD.csv"""
-    path = BHAV_ROOT / f"{d.isoformat()}.csv"
-    # Keep only EQ series to reduce file size
-    if "SERIES" in df.columns:
-        df = df[df["SERIES"].str.strip() == "EQ"].copy()
-    df.to_csv(path, index=False)
-    log.info(f"  Saved {path} ({len(df)} EQ rows)")
-    return path
+    """Save bhav copy as CSV."""
+    df.columns = [c.strip().upper() for c in df.columns]
+    (BHAV_ROOT / d.isoformat()).with_suffix(".csv").write_text(df.to_csv(index=False))
 
 
 def load_bhav_csv(d: date) -> pd.DataFrame | None:
-    """Load existing bhav CSV for date d (any format we saved)."""
-    # Prefer our normalized YYYY-MM-DD.csv
-    p = BHAV_ROOT / f"{d.isoformat()}.csv"
-    if p.exists():
-        return pd.read_csv(p)
-    # Fallback: legacy filenames
-    dd, mm, yyyy = d.strftime("%d"), d.strftime("%m"), d.strftime("%Y")
-    patterns = [
-        BHAV_ROOT / f"sec_bhavdata_full_{dd}{mm}{yyyy}.csv",
-        BHAV_ROOT / f"cm{dd}{d.strftime('%b').upper()}{yyyy}bhav.csv",
-    ]
-    for pat in patterns:
-        if pat.exists():
-            return pd.read_csv(pat)
-    return None
+    """Load saved bhav copy or None."""
+    pth = BHAV_ROOT / d.isoformat()
+    pth = pth.with_suffix(".csv")
+    if not pth.exists():
+        return None
+    try:
+        return pd.read_csv(pth)
+    except Exception:
+        return None
 
 
-def get_known_symbols() -> set[str]:
+def get_config_symbols() -> set[str]:
     """
-    Return the set of symbols that our strategy tracks.
-    Sources:
-      1. db/symbols.txt  — explicitly curated list
-      2. Union of all sim_results_C*.json symbols
-      3. docs/data/mtf_symbols.json — MTF watchlist (NEW)
-      4. Parquet DB if exists
+    OPTIMIZED: Load ONLY symbols from sim_results_C*.json files.
+    Skip MTF watchlist — validate only trading signal symbols.
     """
     syms = set()
-    import json
 
-    # 1. Curated list
-    sym_file = DB_ROOT / "symbols.txt"
-    if sym_file.exists():
-        syms.update(l.strip().upper() for l in sym_file.read_text().splitlines() if l.strip())
-
-    # 2. sim_results JSON files
     for jf in Path("docs/data").glob("sim_results_C*.json"):
         try:
             data = json.loads(jf.read_text())
-            rows = data if isinstance(data, list) else data.get("rows", data.get("data", []))
-            for r in rows:
+            signals = data.get("signals", []) if isinstance(data, dict) else data
+            for r in signals:
                 s = (r.get("SYMBOL") or r.get("symbol") or "").strip().upper()
                 if s:
                     syms.add(s)
-        except Exception:
-            pass
-
-    # 3. MTF symbols watchlist — docs/data/mtf_symbols.json
-    mtf_file = Path("docs/data/mtf_symbols.json")
-    if mtf_file.exists():
-        try:
-            mtf_list = json.loads(mtf_file.read_text())
-            added = 0
-            for entry in mtf_list:
-                s = str(entry).strip().upper()
-                # Skip header row and empty entries
-                if s and s not in ("SYMBOL / SCRIP NAME", "SYMBOL", "SCRIP NAME"):
-                    syms.add(s)
-                    added += 1
-            log.info(f"MTF symbols loaded: {added} from {mtf_file}")
         except Exception as e:
-            log.warning(f"Could not load MTF symbols: {e}")
+            log.warning(f"Could not load {jf}: {e}")
 
-    # 4. Parquet DB if exists
-    pq = DB_ROOT / "eq_filtered.parquet"
-    if pq.exists():
-        try:
-            import pyarrow.parquet as pq_lib
-            t = pq_lib.read_table(pq, columns=["SYMBOL"])
-            syms.update(t.column("SYMBOL").to_pylist())
-        except Exception:
-            pass
-
-    log.info(f"Total known symbols: {len(syms)}")
+    log.info(f"✓ Loaded {len(syms)} symbols from trading signals (skipped MTF watchlist)")
     return syms
 
 
 def fetch_symbol_history_nse(symbol: str, from_d: date, to_d: date, session: requests.Session) -> pd.DataFrame | None:
-    """
-    Fetch OHLCV history for a symbol from NSE historical API.
-    Returns DataFrame with DATE, OPEN, HIGH, LOW, CLOSE, VOLUME or None.
-    """
+    """Fetch OHLCV history for a symbol from NSE historical API."""
     fmt = "%d-%m-%Y"
     url = (
         "https://www.nseindia.com/api/historical/cm/equity"
@@ -254,13 +180,12 @@ def fetch_symbol_history_nse(symbol: str, from_d: date, to_d: date, session: req
         try:
             resp = session.get(url, timeout=20)
             if resp.status_code == 400:
-                return None   # symbol not found or no data
+                return None
             resp.raise_for_status()
             data = resp.json().get("data", [])
             if not data:
                 return None
             df = pd.DataFrame(data)
-            # Normalize columns
             col_map = {
                 "CH_TIMESTAMP": "DATE", "TIMESTAMP": "DATE",
                 "CH_OPENING_PRICE": "OPEN", "CH_TRADE_HIGH_PRICE": "HIGH",
@@ -278,19 +203,15 @@ def fetch_symbol_history_nse(symbol: str, from_d: date, to_d: date, session: req
     return None
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 def main():
-    log.info(f"=== NSE Bhav Validation & Backfill ===")
+    log.info(f"=== NSE Bhav Validation & Backfill (FAST MODE) ===")
     log.info(f"From {FROM_DATE} → {TODAY_IST}  |  force={FORCE}")
 
     session = make_session()
 
-    # ── Phase 1: Ensure bhav copy exists for every trading day ───────────────
+    # ── Phase 1: Download missing bhav copies ────────────────────────────────
     days = list(trading_days(FROM_DATE, TODAY_IST))
-    missing_days = []
-    for d in days:
-        if load_bhav_csv(d) is None:
-            missing_days.append(d)
+    missing_days = [d for d in days if load_bhav_csv(d) is None]
 
     log.info(f"Phase 1: {len(days)} trading days, {len(missing_days)} bhav files missing")
 
@@ -301,17 +222,17 @@ def main():
         if df is not None:
             save_bhav(d, df)
             filled += 1
-            time.sleep(2 + random.uniform(0, 2))   # polite delay
+            time.sleep(2 + random.uniform(0, 2))
 
-    log.info(f"Phase 1 done: {filled}/{len(missing_days)} missing days filled")
+    log.info(f"Phase 1 done: {filled}/{len(missing_days)} missing days filled ✓")
 
-    # ── Phase 2: Validate per-symbol OHLC completeness ───────────────────────
-    known_syms = get_known_symbols()
+    # ── Phase 2: Load symbols from TRADING SIGNALS ONLY (skip MTF) ────────────
+    known_syms = get_config_symbols()
     if not known_syms:
-        log.info("No known symbols found — skipping per-symbol validation")
+        log.info("No known symbols found — skipping validation")
         return
 
-    # Build a symbol → set of dates that exist in bhav data
+    # ── Phase 3: Check for OHLC gaps ──────────────────────────────────────────
     sym_dates: dict[str, set[date]] = {s: set() for s in known_syms}
 
     for d in days:
@@ -327,7 +248,6 @@ def main():
             if s in present:
                 sym_dates[s].add(d)
 
-    # Find symbols with gaps
     all_days_set = set(days)
     gaps: dict[str, list[date]] = {}
     for sym, have in sym_dates.items():
@@ -335,21 +255,19 @@ def main():
         if missing:
             gaps[sym] = missing
 
-    log.info(f"Phase 2: {len(gaps)} symbols have missing OHLC dates")
+    log.info(f"Phase 2: {len(gaps)}/{len(known_syms)} symbols have missing OHLC dates")
 
     if not gaps:
         log.info("All symbols fully covered — nothing to backfill ✓")
         return
 
-    # ── Phase 3: Fetch missing symbol data from NSE API ──────────────────────
+    # ── Phase 4: Fetch missing symbol data ────────────────────────────────────
     log.info(f"Phase 3: Fetching gaps for {len(gaps)} symbols …")
 
-    # Ensure per-symbol CSV directory exists
     sym_dir = DB_ROOT / "symbol_history"
     sym_dir.mkdir(exist_ok=True)
 
     for sym, missing_list in sorted(gaps.items()):
-        # Group consecutive missing dates into ranges for efficient API calls
         ranges: list[tuple[date, date]] = []
         range_start = missing_list[0]
         prev = missing_list[0]
@@ -381,9 +299,9 @@ def main():
             combined.to_csv(sym_path, index=False)
             log.info(f"  ✓ {sym}: {len(new_df)} rows added")
         else:
-            log.warning(f"  ✗ {sym}: could not fetch any data for missing dates")
+            log.warning(f"  ✗ {sym}: could not fetch any data")
 
-    log.info("=== Validation & backfill complete ===")
+    log.info("=== Fast validation & backfill complete ===")
 
 
 if __name__ == "__main__":
