@@ -1699,6 +1699,18 @@ let _dataReady = false;
       if (banner) banner.innerHTML =
         '<span style="color:#d97706">&#9888; No trade data found yet. Run the Generate Signal workflow first.</span>';
       _dataReady = true;
+      // Load saved config filter from localStorage
+    var savedCfgFilter = localStorage.getItem('btst_cfg_active_v2');
+    if(savedCfgFilter) {
+      _cfgTabActive = savedCfgFilter;
+      var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
+      tabList.forEach(function(t){
+        if(!state[t]) state[t]={};
+        state[t].cfg=_cfgTabActive;
+      });
+    }
+    
+
       buildOverview();
       return;
     }
@@ -4018,10 +4030,34 @@ function applyCfgSelect(){
   } else {
     _cfgTabActive=Array.from(_cfgSelTemp).join(',');
   }
+  
+  // Update ALL tab state filters
+  var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
+  tabList.forEach(function(t){
+    if(!state[t]) state[t]={};
+    state[t].cfg=_cfgTabActive;
+    state[t].page=1;
+  });
+  
+  // Persist to localStorage
+  localStorage.setItem('btst_cfg_active_v2',_cfgTabActive);
+  
   updateCfgSelectBtn();
   closeCfgSelectModal();
   renderConfigsPage();
+  
+  // Re-render current visible tab if it exists
+  var activeTab=document.querySelector('.tab.active');
+  if(activeTab){
+    var tabName=activeTab.textContent.trim().toLowerCase();
+    if(tabName.includes('open')&&!tabName.includes('f&o')) renderTab('open');
+    else if(tabName.includes('closed')&&!tabName.includes('f&o')) renderTab('closed');
+    else if(tabName.includes('f&o')&&tabName.includes('open')) renderTab('fno');
+    else if(tabName.includes('f&o')&&tabName.includes('closed')) renderTab('fnoclosed');
+  }
 }
+
+
 function updateCfgSelectBtn(){
   // Update Configs tab button
   var btn=document.getElementById('cfg-select-open-btn');
