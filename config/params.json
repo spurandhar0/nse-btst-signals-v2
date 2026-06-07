@@ -9,20 +9,20 @@
     "force_exit_calendar_days": 90
   },
   "configs": [
-   {
-    "id": "C1",
-    "name": "Config 1",
-    "days_back": 15,
-    "pct_min": -0.1,
-    "pct_max": -0.05,
-    "ath_min": -0.45,
-    "ath_max": -0.4,
-    "max_buys": 4,
-    "buy_drop": 0.1,
-    "target": 0.1,
-    "stoploss": 0.25,
-    "max_duration": 40
-  }
+    {
+      "id": "C1",
+      "name": "Config 1",
+      "days_back": 15,
+      "pct_min": -0.1,
+      "pct_max": -0.05,
+      "ath_min": -0.45,
+      "ath_max": -0.4,
+      "max_buys": 4,
+      "buy_drop": 0.1,
+      "target": 0.1,
+      "stoploss": 0.25,
+      "max_duration": 40
+    }
   ],
   "watch_symbols": []
 }
