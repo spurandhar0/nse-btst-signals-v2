@@ -1673,8 +1673,14 @@ let _dataReady = false;
   if (banner) banner.innerHTML = '&#8987; Loading trade data&hellip;';
 
   try {
-    // Fetch all per-config sim files + trade_ohlc in parallel
-    const configIds = CONFIGS_DEF.map(c => c.id);
+    // Fetch only SELECTED config files + trade_ohlc in parallel
+    // Load saved config filter first
+    var savedCfgFilter = localStorage.getItem('btst_cfg_active_v2');
+    _cfgTabActive = savedCfgFilter || CONFIGS_DEF.map(c => c.id).join(',');
+    
+    var configIds = _cfgTabActive.split(',').filter(id => id.trim() !== '');
+    if (configIds.length === 0) configIds = CONFIGS_DEF.map(c => c.id);
+    
     const allFetches = [
       ...configIds.map(cid => fetch('data/sim_results_' + cid + '.json')),
       fetch('data/trade_ohlc.json'),
@@ -4031,30 +4037,83 @@ function applyCfgSelect(){
     _cfgTabActive=Array.from(_cfgSelTemp).join(',');
   }
   
-  // Update ALL tab state filters
-  var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
-  tabList.forEach(function(t){
-    if(!state[t]) state[t]={};
-    state[t].cfg=_cfgTabActive;
-    state[t].page=1;
-  });
-  
   // Persist to localStorage
   localStorage.setItem('btst_cfg_active_v2',_cfgTabActive);
   
   updateCfgSelectBtn();
   closeCfgSelectModal();
-  renderConfigsPage();
   
-  // Re-render current visible tab if it exists
-  var activeTab=document.querySelector('.tab.active');
-  if(activeTab){
-    var tabName=activeTab.textContent.trim().toLowerCase();
-    if(tabName.includes('open')&&!tabName.includes('f&o')) renderTab('open');
-    else if(tabName.includes('closed')&&!tabName.includes('f&o')) renderTab('closed');
-    else if(tabName.includes('f&o')&&tabName.includes('open')) renderTab('fno');
-    else if(tabName.includes('f&o')&&tabName.includes('closed')) renderTab('fnoclosed');
+  // RELOAD DATA for selected configs
+  reloadDataForConfigs();
+}
+
+function reloadDataForConfigs(){
+  var banner=document.getElementById('liveBanner');
+  if(banner) banner.innerHTML='&#8987; Loading selected configs...';
+  
+  _dataReady=false;
+  ALL_ROWS=[];
+  TRADE_OHLC={};
+  
+  // Parse selected configs
+  var configIds=[];
+  if(_cfgTabActive==='ALL'){
+    configIds=CONFIGS_DEF.map(c=>c.id);
+  } else {
+    configIds=_cfgTabActive.split(',').filter(id=>id.trim()!=='');
   }
+  
+  // Fetch selected configs
+  (async function(){
+    try{
+      var allFetches=[
+        ...configIds.map(cid=>fetch('data/sim_results_'+cid+'.json')),
+        fetch('data/trade_ohlc.json'),
+      ];
+      var allResults=await Promise.all(allFetches);
+      
+      // Process per-config files
+      var totalSignals=0;
+      for(var i=0;i<configIds.length;i++){
+        var res=allResults[i];
+        var cid=configIds[i];
+        if(!res.ok){console.warn('sim_results_'+cid+'.json not found');continue;}
+        var data=await res.json();
+        var signals=data.signals||[];
+        for(var r of signals){
+          ALL_ROWS.push(r);
+          totalSignals++;
+        }
+      }
+      
+      // Process trade_ohlc
+      var ohlcRes=allResults[configIds.length];
+      if(ohlcRes.ok) TRADE_OHLC=await ohlcRes.json();
+      
+      _dataReady=true;
+      if(banner) banner.innerHTML='✓ Last simulation: 07-Jun-2026 22:13 IST | Data date: 2026-06-05';
+      
+      // Reset all tabs and rebuild
+      var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
+      tabList.forEach(function(t){
+        if(!state[t]) state[t]={};
+        state[t].page=1;
+      });
+      
+      buildOverview();
+      renderConfigsPage();
+      
+      // Re-render current visible tab
+      var activeTab=document.querySelector('.tab.active');
+      if(activeTab){
+        var tabName=activeTab.getAttribute('data-tab');
+        if(tabName) renderTab(tabName);
+      }
+    }catch(err){
+      console.error('Data reload failed:',err);
+      if(banner) banner.innerHTML='<span style="color:#dc2626">Error loading configs: '+err.message+'</span>';
+    }
+  })();
 }
 
 
