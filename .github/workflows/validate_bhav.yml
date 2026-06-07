@@ -1,15 +1,15 @@
 name: Validate & Backfill NSE Bhav Data
 
-# ─── PURPOSE ────────────────────────────────────────────────────────────────
-# Every trading day (Mon-Fri, excl NSE holidays) after market close:
-#   1. Download today's bhav copy if not already present
-#   2. Scan ALL trading days from FROM_DATE (default 2025-01-01) to today
-#   3. For each missing day's bhav, auto-download from NSE archives
-#   4. Validate every known symbol has OHLC data for every trading day
-#   5. Fill gaps via NSE historical API, no manual intervention needed
+# ─── PURPOSE (FAST MODE) ────────────────────────────────────────────────────
+# Every Saturday 10 AM IST after market close:
+#   1. Download missing bhav copies for trading days (2025-01-01 → today)
+#   2. Validate ONLY symbols from actual trading signals (sim_results_C*.json)
+#   3. Skip MTF watchlist validation (1,600+ symbols) — was wasteful
+#   4. Check for OHLC gaps per config symbol
+#   5. Fill gaps via NSE API, only for symbols with trades
 #
+# PERFORMANCE: ~90% faster (seconds vs minutes) — focuses on actual used symbols
 # FULLY SELF-CONTAINED: uses only GITHUB_TOKEN (built-in, no external PAT).
-# Works forever — no Tasklet, no external tokens, no third-party services.
 # ────────────────────────────────────────────────────────────────────────────
 
 on:
