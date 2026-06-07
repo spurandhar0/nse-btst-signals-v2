@@ -980,7 +980,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <button class="btn-green btn-sm" onclick="exportTab('signals')">&#8595; Excel</button>
     <button class="btn-teal btn-sm" onclick="exportCSVTab('signals')">&#8595; CSV</button>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
-    <button class="btn-cfg-open" onclick="buildCfgSelGrid();openCfgSelectModal();">&#9881; Configs &nbsp;<span class="cfg-sel-badge" id="top-cfg-badge" style="font-weight:400;opacity:.85">1 CONFIG</span></button>
+    <button class="btn-cfg-open" >&#9881; Configs &nbsp;<span class="cfg-sel-badge"</button>
   </div>
   <div class="card" style="padding:0 0 8px">
     <div class="table-area">
@@ -1031,7 +1031,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 
 <div id="tab-configs" class="hidden">
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px 0;">
-    <button id="cfg-select-open-btn" onclick="buildCfgSelGrid();openCfgSelectModal();" style="padding:8px 18px;border-radius:8px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">&#9881; Configurations (loading...)</button>
+    
     <label style="font-size:13px;color:var(--text2);">Rows per page:
       <select id="configs-pgsize" onchange="renderConfigsPage()" style="margin-left:4px;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text1);font-size:13px;">
         <option value="10">10</option>
@@ -1675,16 +1675,7 @@ let _dataReady = false;
   try {
     // Fetch only SELECTED config files + trade_ohlc in parallel
     // Load saved config filter first
-    var savedCfgFilter = localStorage.getItem('btst_cfg_active_v2');
-    _cfgTabActive = savedCfgFilter || CONFIGS_DEF.map(c => c.id).join(',');
-    
-    var configIds = _cfgTabActive.split(',').filter(id => id.trim() !== '');
-    if (configIds.length === 0) configIds = CONFIGS_DEF.map(c => c.id);
-    
-    const allFetches = [
-      ...configIds.map(cid => fetch('data/sim_results_' + cid + '.json')),
-      fetch('data/trade_ohlc.json'),
-    ];
+    _cfgTabActive = CONFIGS_DEF.map(c => c.id).join(',');
     const allResults = await Promise.all(allFetches);
 
     // Process per-config sim files — merge all signals into ALL_ROWS
@@ -1706,13 +1697,7 @@ let _dataReady = false;
         '<span style="color:#d97706">&#9888; No trade data found yet. Run the Generate Signal workflow first.</span>';
       _dataReady = true;
       // Load saved config filter from localStorage
-    var savedCfgFilter = localStorage.getItem('btst_cfg_active_v2');
-    if(savedCfgFilter) {
-      _cfgTabActive = savedCfgFilter;
-      var tabList=['open','closed','fno','fnoclosed','fe','trades','history','ledger','signals','uniopen','uniclosed','unifno','unifnoclosed'];
-      tabList.forEach(function(t){
-        if(!state[t]) state[t]={};
-        state[t].cfg=_cfgTabActive;
+    _cfgTabActive = CONFIGS_DEF.map(c => c.id).join(',');
       });
     }
     
@@ -1927,7 +1912,7 @@ function showTab(name,el){
   else if(name==='portfolio')   renderPortfolio();
   else if(name==='fno')         renderTab('fno');
   else if(name==='fnoclosed')   renderTab('fnoclosed');
-  else if(name==='configs')    { document.getElementById('cfg-params-table').querySelector('tbody').innerHTML=buildCfgParamsRows(); renderConfigsPage(); updateCfgSelectBtn(); }
+  else if(name==='configs')    { document.getElementById('cfg-params-table').querySelector('tbody').innerHTML=buildCfgParamsRows(); renderConfigsPage();  }
   else if(name==='uniopen')     renderTab('uniopen');
   else if(name==='uniclosed')   renderTab('uniclosed');
   else if(name==='unifno')      renderTab('unifno');
@@ -3978,18 +3963,11 @@ async function portfolioManualAdd() {
 var _cfgSelTemp = new Set(); // temporary selection while modal is open
 var _cfgTabActive = 'ALL';  // current applied filter for configs tab
 
-function openCfgSelectModal(){
-  buildCfgSelGrid();
-  _cfgSelTemp = new Set();
-  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
-  if(_cfgTabActive==='ALL'||_cfgTabActive==='') allBtns.forEach(function(b){_cfgSelTemp.add(b.dataset.id);});
+);
   else _cfgTabActive.split(',').forEach(function(id){_cfgSelTemp.add(id.trim());});
   updateCfgSelGrid();
   var m=document.getElementById('cfg-select-modal');
   m.style.display='flex';
-}
-function closeCfgSelectModal(){
-  document.getElementById('cfg-select-modal').style.display='none';
 }
 function updateCfgSelGrid(){
   var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
@@ -4003,27 +3981,9 @@ function updateCfgSelGrid(){
   var total=allBtns.length;
   document.getElementById('cfg-sel-count').textContent=count+' of '+total+' selected';
 }
-function buildCfgSelGrid(){
-  var grid=document.getElementById('cfg-sel-grid');
-  if(!grid) return;
-  if(grid.children.length>0) return; // already built
-  var ids=(CONFIGS_DEF||[]).map(function(c){return c.id||c.ID;}).filter(Boolean);
-  grid.innerHTML=ids.map(function(id){
-    return '<button class="cfg-sel-btn" data-id="'+id+'" onclick="cfgSelToggle(\''+id+'\') " style="padding:7px 14px;border-radius:8px;border:2px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;min-width:52px;">'+id+'</button>';
-  }).join('');
+).join('');
 }
-function cfgSelToggle(id){
-  if(_cfgSelTemp.has(id)) _cfgSelTemp.delete(id);
-  else _cfgSelTemp.add(id);
-  updateCfgSelGrid();
-}
-function cfgSelAll(){
-  var allBtns=Array.from(document.querySelectorAll('.cfg-sel-btn'));
-  allBtns.forEach(function(b){_cfgSelTemp.add(b.dataset.id);});
-  updateCfgSelGrid();
-}
-function cfgSelClear(){
-  _cfgSelTemp.clear();
+);
   updateCfgSelGrid();
 }
 function applyCfgSelect(){
@@ -4040,20 +4000,14 @@ function applyCfgSelect(){
   // Persist to localStorage
   localStorage.setItem('btst_cfg_active_v2',_cfgTabActive);
   
-  updateCfgSelectBtn();
+  
   closeCfgSelectModal();
   
   // RELOAD DATA for selected configs
-  reloadDataForConfigs();
+  
 }
 
-function reloadDataForConfigs(){
-  var banner=document.getElementById('liveBanner');
-  if(banner) banner.innerHTML='&#8987; Loading selected configs...';
-  
-  _dataReady=false;
-  ALL_ROWS=[];
-  TRADE_OHLC={};
+;
   
   // Parse selected configs
   var configIds=[];
@@ -4117,25 +4071,7 @@ function reloadDataForConfigs(){
 }
 
 
-function updateCfgSelectBtn(){
-  // Update Configs tab button
-  var btn=document.getElementById('cfg-select-open-btn');
-  if(!btn) return;
-  var total=(CONFIGS_DEF||[]).length;
-  var label;
-  if(_cfgTabActive==='ALL'||_cfgTabActive==='') label='&#9881; Configurations (All '+total+' selected)';
-  else if(_cfgTabActive.includes(',')){ var cnt=_cfgTabActive.split(',').length; label='&#9881; Configurations ('+cnt+' of '+total+' selected)'; }
-  else label='&#9881; Configurations ('+_cfgTabActive+' only)';
-  btn.innerHTML=label;
-  
-  // Update top badge
-  var badge=document.getElementById('top-cfg-badge');
-  if(badge){
-    if(_cfgTabActive==='ALL'||_cfgTabActive==='') badge.innerHTML=total+' CONFIGS';
-    else if(_cfgTabActive.includes(',')){ var cnt=_cfgTabActive.split(',').length; badge.innerHTML=cnt+' CONFIGS'; }
-    else badge.innerHTML='1 CONFIG';
-  }
-}
+// Config UI removed - auto-loads from CONFIGS_DEF in params.json
 
 
 function buildCfgParamsRows(){
