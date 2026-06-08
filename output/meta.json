@@ -1,9 +1,9 @@
 {
-  "generated_at": "07-Jun-2026 23:12 IST",
-  "signal_date": "05-Jun-2026",
-  "total_signals": 0,
+  "generated_at": "08-Jun-2026 20:27 IST",
+  "signal_date": "08-Jun-2026",
+  "total_signals": 2,
   "config_breakdown": {
-    "C1": 212
+    "C1": 2
   },
   "configs": [
     {
@@ -20,8 +20,5 @@
       "stoploss": 0.25,
       "max_duration": 40
     }
-  ],
-  "backfill": true,
-  "backfill_from": "2025-01-01",
-  "backfill_dates": 351
+  ]
 }
