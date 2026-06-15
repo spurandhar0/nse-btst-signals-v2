@@ -1,7 +1,7 @@
 {
-  "generated_at": "12-Jun-2026 19:55 IST",
-  "signal_date": "12-Jun-2026",
-  "total_signals": 0,
+  "generated_at": "15-Jun-2026 22:01 IST",
+  "signal_date": "15-Jun-2026",
+  "total_signals": 1,
   "config_breakdown": {
     "C1": 0,
     "C2": 0,
@@ -16,7 +16,7 @@
     "C11": 0,
     "C12": 0,
     "C13": 0,
-    "C14": 0,
+    "C14": 1,
     "C15": 0,
     "C16": 0,
     "C17": 0,
