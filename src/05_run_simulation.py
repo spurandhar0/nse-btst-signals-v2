@@ -21,9 +21,7 @@ import time
 import json
 import pandas as pd
 from datetime import datetime, timezone, timedelta
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
+# openpyxl imported lazily inside Excel functions (optional local use only)
 
 SKIP_EXCEL = os.environ.get('SKIP_EXCEL', 'false').lower() == 'true'
 SIM_TIME_BUDGET_SEC = int(os.environ.get('SIM_TIME_BUDGET_MINUTES', '50')) * 60
@@ -556,6 +554,9 @@ def write_picks_to_sheet(ws, rows, columns):
 
 
 def write_picks_excel(rows, columns, out_path, market_data=None, buy_history=None):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
     wb = Workbook()
     ws = wb.active
     ws.title = "Pickse"
@@ -584,6 +585,9 @@ def write_picks_excel(rows, columns, out_path, market_data=None, buy_history=Non
 
 
 def write_consolidated_excel(config_data, out_path, market_data=None):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
     wb = Workbook()
     first = True
     for cid, columns, rows in config_data:
@@ -987,4 +991,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
