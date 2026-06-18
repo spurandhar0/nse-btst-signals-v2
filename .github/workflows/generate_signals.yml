@@ -71,16 +71,36 @@ jobs:
       # ── Steps 5-6 and public push: only when backfill is fully complete ─────
       - name: Step 5 – Run simulation & build dashboard JSON
         if: steps.backfill.outputs.exit_code == '0'
+        id: simulation
+        run: |
+          set +e
+          python src/05_run_simulation.py
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          # 0 (complete) and 2 (partial/time-budget) are both expected
+          [ $code -eq 0 ] || [ $code -eq 2 ] && exit 0 || exit $code
         env:
           SKIP_EXCEL: 'true'
-        run: python src/05_run_simulation.py
+          SIM_TIME_BUDGET_MINUTES: '50'
+
+      # Auto-trigger another run when Step 5 hit its time budget
+      - name: Auto-trigger resume (simulation partial)
+        if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run generate_signals.yml \
+            --ref main \
+            --field rebuild_db=no \
+            --field signal_start_date=${{ github.event.inputs.signal_start_date || '2025-01-01' }}
+          echo "↩️  Queued resume run (Step 5 partial — simulation will skip already-done configs)"
 
       - name: Step 6 – Build dashboard HTML
-        if: steps.backfill.outputs.exit_code == '0'
+        if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '0'
         run: python src/05_build_dashboard.py
 
       - name: Push dashboard to public repo
-        if: steps.backfill.outputs.exit_code == '0'
+        if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '0'
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -119,7 +139,7 @@ jobs:
           git push origin main
 
       - name: Commit private repo data (complete run)
-        if: steps.backfill.outputs.exit_code == '0'
+        if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '0'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
