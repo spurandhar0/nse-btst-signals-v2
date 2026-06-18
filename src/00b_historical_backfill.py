@@ -9,23 +9,29 @@ Output: db/signals_C1.parquet ... db/signals_C4.parquet  (deduplicated)
         output/signals_latest.csv
         output/meta.json
 
-Run this ONCE after bootstrapping historical data.
-Daily signals (04_run_daily_signals.py) will then APPEND to these parquets.
+Supports checkpoint/resume for long runs (10 h+):
+  - Saves progress to db/backfill_checkpoint.json after each date
+  - On restart, skips already-processed dates automatically
+  - Exits with code 2 if time budget exceeded (partial run)
+  - Exits with code 0 when fully complete
 
 SIGNAL_START_DATE can be overridden via environment variable:
   SIGNAL_START_DATE=2025-01-01 python src/00b_historical_backfill.py
+
+BACKFILL_TIME_BUDGET_MINUTES: max runtime before saving + pausing (default: 300)
 """
 
-import os, json
+import os, json, sys, time
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 
-CONFIG_FILE = "config/params.json"
-EQ_FILE     = "db/eq_data.parquet"
-ATH_FILE    = "db/ath.parquet"
-OUTPUT_DIR  = "output"
-DB_DIR      = "db"
+CONFIG_FILE     = "config/params.json"
+EQ_FILE         = "db/eq_data.parquet"
+ATH_FILE        = "db/ath.parquet"
+OUTPUT_DIR      = "output"
+DB_DIR          = "db"
+CHECKPOINT_FILE = "db/backfill_checkpoint.json"
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -34,10 +40,31 @@ _env_start = os.environ.get("SIGNAL_START_DATE", "2025-01-01")
 SIGNAL_START_DATE = pd.Timestamp(_env_start)
 print(f"Signal scan start date: {SIGNAL_START_DATE.date()}")
 
+# Time budget in minutes before saving progress and pausing (default 300 = 5 h)
+TIME_BUDGET_MINUTES = int(os.environ.get("BACKFILL_TIME_BUDGET_MINUTES", "300"))
+
 
 def load_config():
     with open(CONFIG_FILE) as f:
         return json.load(f)
+
+
+def load_checkpoint():
+    """Return set of already-completed date strings (YYYY-MM-DD)."""
+    if os.path.exists(CHECKPOINT_FILE):
+        with open(CHECKPOINT_FILE) as f:
+            data = json.load(f)
+        completed = set(data.get("completed_dates", []))
+        print(f"Checkpoint loaded: {len(completed)} dates already done")
+        return completed
+    return set()
+
+
+def save_checkpoint(completed_dates):
+    """Persist set of completed date strings to checkpoint file."""
+    os.makedirs(DB_DIR, exist_ok=True)
+    with open(CHECKPOINT_FILE, "w") as f:
+        json.dump({"completed_dates": sorted(completed_dates)}, f)
 
 
 def save_config_parquet(cid, rows, db_dir):
@@ -64,6 +91,83 @@ def save_config_parquet(cid, rows, db_dir):
     combined.to_parquet(parquet_path, index=False)
     print(f"  {cid}: {len(rows):,} signals → {len(combined):,} total in parquet")
     return len(rows)
+
+
+def write_latest_outputs(configs, all_dates, db_dir, output_dir,
+                         all_signals=None, total=0):
+    """Write signals_latest.csv and meta.json (from in-memory or parquet)."""
+    latest_date = all_dates[-1]
+
+    if all_signals is None:
+        # Resume-complete path: load from parquets
+        all_signals = {}
+        for c in configs:
+            parquet_path = os.path.join(db_dir, f"signals_{c['id']}.parquet")
+            if os.path.exists(parquet_path):
+                df = pd.read_parquet(parquet_path)
+                df["SIGNAL_DATE"] = pd.to_datetime(df["SIGNAL_DATE"])
+                rows = df[df["SIGNAL_DATE"] == latest_date].to_dict("records")
+                all_signals[c["id"]] = rows
+            else:
+                all_signals[c["id"]] = []
+
+    combined_view = {}
+    for c in configs:
+        for row in all_signals[c["id"]]:
+            if pd.Timestamp(row["SIGNAL_DATE"]) == latest_date:
+                sym = row["SYMBOL"]
+                if sym not in combined_view:
+                    combined_view[sym] = {
+                        "SYMBOL":          sym,
+                        "SIGNAL_DATE":     latest_date.strftime("%Y-%m-%d"),
+                        "SIGNAL_CLOSE":    row["SIGNAL_CLOSE"],
+                        "PREV_CLOSE":      row["PREV_CLOSE"],
+                        "ATH_PRICE":       row["ATH_PRICE"],
+                        "MIN_5D_LOW":      row["MIN_5D_LOW"],
+                        "PCT_FROM_LOW":    row["PCT_FROM_LOW"],
+                        "PCT_FROM_ATH":    row["PCT_FROM_ATH"],
+                        "PCT_1D_CHANGE":   row["PCT_1D_CHANGE"],
+                        "CONFIGS_MATCHED": c["id"],
+                        "CONFIG_COUNT":    1,
+                    }
+                else:
+                    combined_view[sym]["CONFIGS_MATCHED"] += "," + c["id"]
+                    combined_view[sym]["CONFIG_COUNT"]    += 1
+
+    rows_list = sorted(combined_view.values(),
+                       key=lambda x: (-x["CONFIG_COUNT"], x["SYMBOL"]))
+    df_out = pd.DataFrame(rows_list) if rows_list else pd.DataFrame(columns=[
+        "SYMBOL", "SIGNAL_DATE", "SIGNAL_CLOSE", "PREV_CLOSE", "ATH_PRICE",
+        "MIN_5D_LOW", "PCT_FROM_LOW", "PCT_FROM_ATH", "PCT_1D_CHANGE",
+        "CONFIGS_MATCHED", "CONFIG_COUNT"
+    ])
+
+    date_str = latest_date.strftime("%d%m%Y")
+    df_out.to_csv(f"{output_dir}/signals_{date_str}.csv", index=False)
+    df_out.to_csv(f"{output_dir}/signals_latest.csv", index=False)
+
+    config_breakdown = {c["id"]: len(all_signals[c["id"]]) for c in configs}
+    meta = {
+        "generated_at":     datetime.now(tz=IST).strftime("%d-%b-%Y %H:%M IST"),
+        "signal_date":      latest_date.strftime("%d-%b-%Y"),
+        "total_signals":    len(rows_list),
+        "config_breakdown": config_breakdown,
+        "configs":          configs,
+        "backfill":         True,
+        "backfill_from":    str(SIGNAL_START_DATE.date()),
+        "backfill_dates":   len(all_dates),
+    }
+    with open(f"{output_dir}/meta.json", "w") as f:
+        json.dump(meta, f, indent=2, default=str)
+
+    print(f"\n{'='*60}")
+    print(f"BACKFILL COMPLETE")
+    print(f"{'='*60}")
+    print(f"Dates scanned    : {len(all_dates)}")
+    print(f"Total signals    : {total:,}")
+    for cid, cnt in config_breakdown.items():
+        print(f"  {cid}             : {cnt:,}")
+    print(f"Latest date sigs : {len(rows_list)}")
 
 
 def main():
@@ -98,7 +202,22 @@ def main():
         print(f"❌ No dates found from {SIGNAL_START_DATE.date()} onwards in eq_data!")
         raise SystemExit(1)
 
-    print(f"\nWill scan {len(all_dates)} trading dates from {all_dates[0].date()} → {all_dates[-1].date()}")
+    print(f"\nTotal trading dates from start: {len(all_dates)} "
+          f"({all_dates[0].date()} → {all_dates[-1].date()})")
+
+    # ── Resume from checkpoint ──────────────────────────────────────────────
+    completed_dates = load_checkpoint()
+    remaining_dates = [d for d in all_dates if str(d)[:10] not in completed_dates]
+    skipped = len(all_dates) - len(remaining_dates)
+    print(f"Skipping {skipped} already-processed dates | Remaining: {len(remaining_dates)} dates")
+    print(f"Time budget: {TIME_BUDGET_MINUTES} min\n")
+
+    if not remaining_dates:
+        print("✅ All dates already processed — writing final outputs")
+        if os.path.exists(CHECKPOINT_FILE):
+            os.remove(CHECKPOINT_FILE)
+        write_latest_outputs(configs, all_dates, DB_DIR, OUTPUT_DIR)
+        return
 
     # ── Per-symbol pre-group (fast lookup) ──────────────────────────────────
     print("Pre-grouping by symbol...")
@@ -113,13 +232,20 @@ def main():
     symbols = list(groups.keys())
     print(f"  {len(symbols):,} symbols pre-grouped\n")
 
-    # ── Scan every date ─────────────────────────────────────────────────────
-    all_signals = {c["id"]: [] for c in configs}
+    # ── Time budget ─────────────────────────────────────────────────────────
+    start_time     = time.time()
+    budget_seconds = TIME_BUDGET_MINUTES * 60
 
-    for date_i, date in enumerate(all_dates):
-        if (date_i + 1) % 20 == 0 or date_i == 0 or date_i == len(all_dates) - 1:
+    # ── Scan remaining dates ─────────────────────────────────────────────────
+    all_signals = {c["id"]: [] for c in configs}
+    partial     = False
+
+    for date_i, date in enumerate(remaining_dates):
+        if (date_i + 1) % 20 == 0 or date_i == 0 or date_i == len(remaining_dates) - 1:
+            elapsed_min = (time.time() - start_time) / 60
             counts = {c["id"]: len(all_signals[c["id"]]) for c in configs}
-            print(f"  [{date_i+1:3d}/{len(all_dates)}] {date.date()} | signals so far: {counts}")
+            print(f"  [{date_i+1:3d}/{len(remaining_dates)}] {date.date()} | "
+                  f"signals: {counts} | elapsed: {elapsed_min:.1f} min")
 
         for sym in symbols:
             g         = groups[sym]
@@ -130,10 +256,9 @@ def main():
             if ath_price <= 0:
                 continue
 
-            # Binary-search for this date
             idx = np.searchsorted(dates, date, side="right") - 1
             if idx < 0 or dates[idx] != date:
-                continue   # no data for this symbol on this date
+                continue
 
             today_close = closes[idx]
             if today_close <= 0:
@@ -162,13 +287,11 @@ def main():
                 if not (ath_min <= pct_from_ath <= ath_max):
                     continue
 
-                # ── Signal found! ──────────────────────────────────────────
                 min_idx     = int(np.argmin(lookback_lows))
                 min_5d_date = dates[idx - days_back + min_idx]
-
-                prev_close = closes[idx - 1] if idx > 0 else 0.0
-                pct_1d     = ((today_close - prev_close) / prev_close
-                              if prev_close > 0 else 0.0)
+                prev_close  = closes[idx - 1] if idx > 0 else 0.0
+                pct_1d      = ((today_close - prev_close) / prev_close
+                               if prev_close > 0 else 0.0)
 
                 all_signals[cfg["id"]].append({
                     "SYMBOL":        sym,
@@ -183,70 +306,39 @@ def main():
                     "PCT_1D_CHANGE": round(pct_1d * 100, 2),
                 })
 
-    # ── Save per-config parquets ─────────────────────────────────────────────
+        # Mark date complete
+        completed_dates.add(str(date)[:10])
+
+        # Check time budget after each date
+        if time.time() - start_time > budget_seconds:
+            elapsed_min = (time.time() - start_time) / 60
+            print(f"\n⏱ Time budget of {TIME_BUDGET_MINUTES} min exceeded "
+                  f"({elapsed_min:.1f} min elapsed) — saving progress and pausing.")
+            partial = True
+            break
+
+    # ── Save per-config parquets (always: partial or complete) ───────────────
     print("\nSaving per-config signal parquets …")
     total = 0
     for c in configs:
         total += save_config_parquet(c["id"], all_signals[c["id"]], DB_DIR)
 
-    # ── Latest CSV + meta ────────────────────────────────────────────────────
-    latest_date = all_dates[-1]
-    combined_view = {}
-    for c in configs:
-        for row in all_signals[c["id"]]:
-            if row["SIGNAL_DATE"] == latest_date:
-                sym = row["SYMBOL"]
-                if sym not in combined_view:
-                    combined_view[sym] = {
-                        "SYMBOL":          sym,
-                        "SIGNAL_DATE":     latest_date.strftime("%Y-%m-%d"),
-                        "SIGNAL_CLOSE":    row["SIGNAL_CLOSE"],
-                        "PREV_CLOSE":      row["PREV_CLOSE"],
-                        "ATH_PRICE":       row["ATH_PRICE"],
-                        "MIN_5D_LOW":      row["MIN_5D_LOW"],
-                        "PCT_FROM_LOW":    row["PCT_FROM_LOW"],
-                        "PCT_FROM_ATH":    row["PCT_FROM_ATH"],
-                        "PCT_1D_CHANGE":   row["PCT_1D_CHANGE"],
-                        "CONFIGS_MATCHED": c["id"],
-                        "CONFIG_COUNT":    1,
-                    }
-                else:
-                    combined_view[sym]["CONFIGS_MATCHED"] += "," + c["id"]
-                    combined_view[sym]["CONFIG_COUNT"]    += 1
+    if partial:
+        save_checkpoint(completed_dates)
+        remaining_after = len(all_dates) - len(completed_dates)
+        print(f"\n{'='*60}")
+        print(f"PARTIAL BACKFILL — checkpoint saved")
+        print(f"  Completed : {len(completed_dates)} / {len(all_dates)} dates")
+        print(f"  Remaining : {remaining_after} dates")
+        print(f"  Signals   : {total:,} saved this leg")
+        print(f"{'='*60}")
+        sys.exit(2)   # Tells workflow: partial — please re-trigger
 
-    rows = sorted(combined_view.values(), key=lambda x: (-x["CONFIG_COUNT"], x["SYMBOL"]))
-    df   = pd.DataFrame(rows) if rows else pd.DataFrame(columns=[
-        "SYMBOL", "SIGNAL_DATE", "SIGNAL_CLOSE", "PREV_CLOSE", "ATH_PRICE",
-        "MIN_5D_LOW", "PCT_FROM_LOW", "PCT_FROM_ATH", "PCT_1D_CHANGE",
-        "CONFIGS_MATCHED", "CONFIG_COUNT"
-    ])
+    # ── Complete — remove checkpoint and write final outputs ─────────────────
+    if os.path.exists(CHECKPOINT_FILE):
+        os.remove(CHECKPOINT_FILE)
 
-    date_str = latest_date.strftime("%d%m%Y")
-    df.to_csv(f"{OUTPUT_DIR}/signals_{date_str}.csv", index=False)
-    df.to_csv(f"{OUTPUT_DIR}/signals_latest.csv", index=False)
-
-    config_breakdown = {c["id"]: len(all_signals[c["id"]]) for c in configs}
-    meta = {
-        "generated_at":     datetime.now(tz=IST).strftime("%d-%b-%Y %H:%M IST"),
-        "signal_date":      latest_date.strftime("%d-%b-%Y"),
-        "total_signals":    len(rows),
-        "config_breakdown": config_breakdown,
-        "configs":          configs,
-        "backfill":         True,
-        "backfill_from":    str(SIGNAL_START_DATE.date()),
-        "backfill_dates":   len(all_dates),
-    }
-    with open(f"{OUTPUT_DIR}/meta.json", "w") as f:
-        json.dump(meta, f, indent=2, default=str)
-
-    print(f"\n{'='*60}")
-    print(f"BACKFILL COMPLETE")
-    print(f"{'='*60}")
-    print(f"Dates scanned    : {len(all_dates)}")
-    print(f"Total signals    : {total:,}")
-    for cid, cnt in config_breakdown.items():
-        print(f"  {cid}             : {cnt:,}")
-    print(f"Latest date sigs : {len(rows)}")
+    write_latest_outputs(configs, all_dates, DB_DIR, OUTPUT_DIR, all_signals, total)
 
 
 if __name__ == "__main__":
