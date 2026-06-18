@@ -16,6 +16,8 @@ Also exports JSON for dashboard:
 """
 
 import os
+import sys
+import time
 import json
 import pandas as pd
 from datetime import datetime, timezone, timedelta
@@ -24,6 +26,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 SKIP_EXCEL = os.environ.get('SKIP_EXCEL', 'false').lower() == 'true'
+SIM_TIME_BUDGET_SEC = int(os.environ.get('SIM_TIME_BUDGET_MINUTES', '50')) * 60
 
 CONFIG_FILE = "config/params.json"
 EQ_FILE     = "db/eq_data.parquet"
@@ -770,6 +773,29 @@ def export_sim_json(consolidated_data, price_dict, global_last_date):
         print(f"✅ Exported {cfg_path}  ({cfg_kb:,.0f} KB, {len(config_rows):,} signals)")
         config_list.append(cid)
 
+    # ── Merge with any previously written sim_results (checkpoint resume) ────────
+    existing_cfgs = []
+    if os.path.isdir('docs/data'):
+        for fn in sorted(os.listdir('docs/data')):
+            if fn.startswith('sim_results_') and fn.endswith('.json'):
+                ecid = fn.replace('sim_results_', '').replace('.json', '')
+                if ecid not in config_list:
+                    existing_cfgs.append(ecid)
+    if existing_cfgs:
+        print(f"  📍 Merging {len(existing_cfgs)} previously completed configs into sim_meta")
+        config_list = existing_cfgs + config_list   # existing first, then new
+
+    # ── Merge trade_ohlc.json from previous partial run ───────────────────────
+    ohlc_path = 'docs/data/trade_ohlc.json'
+    if existing_cfgs and os.path.exists(ohlc_path):
+        try:
+            with open(ohlc_path) as f:
+                prev_ohlc = json.load(f)
+            prev_ohlc.update(ohlc_out)   # new keys overwrite old ones
+            ohlc_out = prev_ohlc
+        except Exception:
+            pass  # if corrupt, just use what we have
+
     # ── sim_meta.json ──────────────────────────────────────────────────────────
     sim_meta = {**meta, 'configs': config_list}
     with open('docs/data/sim_meta.json', 'w') as f:
@@ -826,7 +852,18 @@ def main():
     month_dir = os.path.join(OUTPUT_DIR, global_last_date.strftime("%Y-%m"))
     os.makedirs(month_dir, exist_ok=True)
 
+    # ── Checkpoint: find configs already done in a previous partial run ─────────
+    done_configs = set()
+    if os.path.isdir('docs/data'):
+        for fn in os.listdir('docs/data'):
+            if fn.startswith('sim_results_') and fn.endswith('.json'):
+                done_configs.add(fn.replace('sim_results_', '').replace('.json', ''))
+    if done_configs:
+        print(f"\n📍 Checkpoint resume: {len(done_configs)} configs already done — skipping them")
+
     consolidated_data = []
+    time_budget_hit   = False
+    sim_start_time    = time.time()
 
     for c in configs:
         cid          = c["id"]
@@ -835,6 +872,19 @@ def main():
         target_pct   = c["target"]
         stoploss_pct = c["stoploss"]
         max_duration = c["max_duration"]
+
+        # ── Skip already-done configs (checkpoint resume) ─────────────────────
+        if cid in done_configs:
+            print(f"  ⏭️  {cid}: already done — skipping")
+            continue
+
+        # ── Time budget check ─────────────────────────────────────────────────
+        elapsed   = time.time() - sim_start_time
+        remaining = SIM_TIME_BUDGET_SEC - elapsed
+        if remaining < 180:   # less than 3 min left — defer remaining configs
+            print(f"\n⏰ Time budget ({os.environ.get('SIM_TIME_BUDGET_MINUTES','50')}min) nearly exhausted — "                  f"{cid} and remaining configs deferred to next run")
+            time_budget_hit = True
+            break
 
         signals_path = os.path.join(DB_DIR, f"signals_{cid}.parquet")
         if not os.path.exists(signals_path):
@@ -903,12 +953,12 @@ def main():
         if not SKIP_EXCEL:
             cons_path = os.path.join(month_dir, f"Consolidated_Picks_{ts_str}.xlsx")
             write_consolidated_excel(consolidated_data, cons_path, market_data=market_data)
-        # Export JSON for dashboard (always)
+        # Export JSON for dashboard (always) — merges with any previous partial run
         export_sim_json(consolidated_data, price_dict, global_last_date)
-    else:
+    elif not done_configs:
+        # Nothing done at all (fresh run, no signals)
         print("\n⚠️  No config data to consolidate — no signal parquets found yet")
         print("   Run the Bootstrap workflow first, then Daily Signals.")
-        # Write empty sim_results.json so the dashboard push step never fails
         os.makedirs('docs/data', exist_ok=True)
         empty_meta = {
             'generated_at': datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST'),
@@ -920,10 +970,19 @@ def main():
         with open('docs/data/trade_ohlc.json', 'w') as f:
             json.dump({}, f)
         print("   ✅ Wrote empty docs/data/sim_meta.json + trade_ohlc.json")
+    else:
+        # Resume run but all remaining configs were skipped (no new signals) — still rebuild meta
+        print("\n  All remaining configs skipped (no new signals parquets)")
+        export_sim_json([], price_dict, global_last_date)
 
     print(f"\n{'='*60}")
-    print(f"Simulation complete — {datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST')}")
-    print(f"Output folder: {month_dir}")
+    if time_budget_hit:
+        print(f"⏰ Partial run — will auto-resume next run — {datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST')}")
+        sys.exit(2)
+    else:
+        print(f"✅ Simulation complete — {datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST')}")
+        print(f"Output folder: {month_dir}")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
