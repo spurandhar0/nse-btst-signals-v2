@@ -1352,7 +1352,7 @@ const symLtpMap = {}; // all-symbol LTP map (open + closed)
 // ─── INDICES ─────────────────────────────────────────────────────────────────
 (function(){
   // Try to fetch fresh nifty data from nse-btst-dashboard first
-  fetch('https://spurandhar0.github.io/nse-btst-dashboard/nifty_index.json')
+  fetch('data/nifty_index.json')
     .then(r=>r.json())
     .then(liveData=>renderIndices(liveData))
     .catch(()=>renderIndices(NIFTY_DATA));
@@ -3682,13 +3682,20 @@ function reloadDataForConfigs(){
   var banner = document.getElementById('liveBanner');
   if(banner) banner.innerHTML = '&#8987; Loading trade data&hellip;';
   var configIds = [];
-  if(_cfgTabActive === 'ALL'){
-    configIds = CONFIGS_DEF.map(function(c){ return c.id; });
-  } else {
+  if(_cfgTabActive !== 'ALL'){
     configIds = _cfgTabActive.split(',').filter(function(id){ return id.trim() !== ''; });
   }
   (async function(){
     try{
+      // Fetch sim_meta first — get only configs that have results (avoids 404 storm)
+      var simMeta = {};
+      try{
+        var metaRes = await fetch('data/sim_meta.json');
+        if(metaRes.ok) simMeta = await metaRes.json();
+      } catch(e){}
+      if(_cfgTabActive === 'ALL'){
+        configIds = simMeta.configs || CONFIGS_DEF.map(function(c){ return c.id; });
+      }
       var allFetches = [
         ...configIds.map(function(cid){ return fetch('data/sim_results_'+cid+'.json'); }),
         fetch('data/trade_ohlc.json'),
@@ -3707,14 +3714,10 @@ function reloadDataForConfigs(){
       if(ohlcRes.ok) TRADE_OHLC = await ohlcRes.json();
       _dataReady = true;
       try{
-        var metaRes = await fetch('data/sim_meta.json');
-        if(metaRes.ok){
-          var simMeta = await metaRes.json();
-          var ddEl = document.getElementById('bannerDataDate');
-          if(ddEl && simMeta.last_date) ddEl.textContent = simMeta.last_date;
-          var bdEl = document.getElementById('bannerDate');
-          if(bdEl && simMeta.generated_at) bdEl.textContent = simMeta.generated_at;
-        }
+        var ddEl = document.getElementById('bannerDataDate');
+        if(ddEl && simMeta.last_date) ddEl.textContent = simMeta.last_date;
+        var bdEl = document.getElementById('bannerDate');
+        if(bdEl && simMeta.generated_at) bdEl.textContent = simMeta.generated_at;
       } catch(e){}
       openSymbols.clear();
       for(var k of Object.keys(openMap)) delete openMap[k];
