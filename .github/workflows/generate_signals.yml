@@ -32,7 +32,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pandas numpy pyarrow openpyxl requests
+        run: pip install pandas numpy pyarrow requests
 
       - name: Step 1 – Consolidate bhavcopy CSVs → parquet
         if: ${{ github.event.inputs.rebuild_db != 'no' }}
@@ -69,8 +69,10 @@ jobs:
           BACKFILL_TIME_BUDGET_MINUTES: "300"   # 5 h budget; ~50 min left for other steps
 
       # ── Steps 5-6 and public push: only when backfill is fully complete ─────
-      - name: Step 5 – Run simulation & generate per-config Excel files
+      - name: Step 5 – Run simulation & build dashboard JSON
         if: steps.backfill.outputs.exit_code == '0'
+        env:
+          SKIP_EXCEL: 'true'
         run: python src/05_run_simulation.py
 
       - name: Step 6 – Build dashboard HTML
