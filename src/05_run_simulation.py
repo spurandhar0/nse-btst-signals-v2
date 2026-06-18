@@ -23,6 +23,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
+SKIP_EXCEL = os.environ.get('SKIP_EXCEL', 'false').lower() == 'true'
+
 CONFIG_FILE = "config/params.json"
 EQ_FILE     = "db/eq_data.parquet"
 OUTPUT_DIR  = "output"
@@ -890,16 +892,18 @@ def main():
         print(f"  Results: Executed={executed} (Open={open_c}, Closed={closed_c}) "
               f"Pending={pending} Expired={expired} Invalid={inv_c}")
 
-        out_path = os.path.join(month_dir, f"{cid}_Picks_{ts_str}.xlsx")
-        write_picks_excel(rows, columns, out_path,
-                          market_data=market_data, buy_history=buy_history)
+        if not SKIP_EXCEL:
+            out_path = os.path.join(month_dir, f"{cid}_Picks_{ts_str}.xlsx")
+            write_picks_excel(rows, columns, out_path,
+                              market_data=market_data, buy_history=buy_history)
 
         consolidated_data.append((cid, columns, rows))
 
     if consolidated_data:
-        cons_path = os.path.join(month_dir, f"Consolidated_Picks_{ts_str}.xlsx")
-        write_consolidated_excel(consolidated_data, cons_path, market_data=market_data)
-        # Export JSON for dashboard
+        if not SKIP_EXCEL:
+            cons_path = os.path.join(month_dir, f"Consolidated_Picks_{ts_str}.xlsx")
+            write_consolidated_excel(consolidated_data, cons_path, market_data=market_data)
+        # Export JSON for dashboard (always)
         export_sim_json(consolidated_data, price_dict, global_last_date)
     else:
         print("\n⚠️  No config data to consolidate — no signal parquets found yet")
