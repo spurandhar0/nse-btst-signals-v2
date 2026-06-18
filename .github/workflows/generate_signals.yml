@@ -87,13 +87,22 @@ jobs:
       - name: Auto-trigger resume (simulation partial)
         if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '2'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          SIGNAL_START_DATE: ${{ github.event.inputs.signal_start_date || '2025-01-01' }}
         run: |
-          gh workflow run generate_signals.yml \
-            --ref main \
-            --field rebuild_db=no \
-            --field signal_start_date=${{ github.event.inputs.signal_start_date || '2025-01-01' }}
-          echo "↩️  Queued resume run (Step 5 partial — simulation will skip already-done configs)"
+          HTTP_CODE=$(curl -s -o /tmp/gh_trigger_sim.json -w "%{http_code}" -X POST \
+            -H "Authorization: token ${GH_PAT}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/spurandhar0/nse-btst-signals-v2/actions/workflows/generate_signals.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"signal_start_date\":\"${SIGNAL_START_DATE}\",\"rebuild_db\":\"no\"}}")
+          echo "GitHub API response: $HTTP_CODE"
+          cat /tmp/gh_trigger_sim.json || true
+          if [ "$HTTP_CODE" -eq 204 ]; then
+            echo "↩️  Queued resume run (Step 5 partial — simulation will skip already-done configs)"
+          else
+            echo "❌ Failed to trigger resume (HTTP $HTTP_CODE) — please re-run manually"
+            exit 1
+          fi
 
       - name: Step 6 – Build dashboard HTML
         if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '0'
@@ -182,3 +191,4 @@ jobs:
             echo "❌ Failed to trigger next leg (HTTP $HTTP_CODE) — please re-run manually"
             exit 1
           fi
+
