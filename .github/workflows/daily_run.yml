@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+# Prevent overlapping daily/backfill runs from racing on shared checkpoints and branches.
+concurrency:
+  group: nse-btst-pipeline
+  cancel-in-progress: false
+
 jobs:
   run-signals:
     runs-on: ubuntu-latest
