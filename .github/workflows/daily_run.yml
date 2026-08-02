@@ -171,3 +171,4 @@ jobs:
           find output/ -maxdepth 3 \( -name "*.csv" -o -name "*.json" -o -name ".gitignore" \) | xargs git add 2>/dev/null || true
           git diff --staged --quiet && echo "Nothing to commit" || git commit -m "Daily signals + simulation: $(date +'%Y-%m-%d')"
           git push origin HEAD:main
+
