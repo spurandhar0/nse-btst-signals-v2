@@ -113,45 +113,36 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          cd /tmp
-          git clone https://x-access-token:${GH_PAT}@github.com/spurandhar0/nse-btst-signals-dashboard-v2.git pub-dashboard
-          mkdir -p pub-dashboard/docs/data
-
-          # index.html — always required
-          cp $GITHUB_WORKSPACE/docs/index.html pub-dashboard/docs/index.html
-
-          # sim_results per-config JSON files
-          for cfg_file in $GITHUB_WORKSPACE/docs/data/sim_results_C*.json; do
-            [ -f "$cfg_file" ] && cp "$cfg_file" pub-dashboard/docs/data/ || true
-          done
-
-          # sim_meta.json
-          [ -f "$GITHUB_WORKSPACE/docs/data/sim_meta.json" ] \
-            && cp $GITHUB_WORKSPACE/docs/data/sim_meta.json pub-dashboard/docs/data/sim_meta.json \
-            || echo "⚠  sim_meta.json not found — skipping"
-
-          # trade_ohlc.json
-          [ -f "$GITHUB_WORKSPACE/docs/data/trade_ohlc.json" ] \
-            && cp $GITHUB_WORKSPACE/docs/data/trade_ohlc.json pub-dashboard/docs/data/trade_ohlc.json \
-            || echo "⚠  trade_ohlc.json not found — skipping"
-
-          # nifty_index.json — optional
-          [ -f "$GITHUB_WORKSPACE/docs/data/nifty_index.json" ] \
-            && cp $GITHUB_WORKSPACE/docs/data/nifty_index.json pub-dashboard/docs/data/nifty_index.json \
-            || true
-
-          cd pub-dashboard
+          set -euo pipefail
+          rm -rf /tmp/pub-dashboard
+          git clone https://x-access-token:${GH_PAT}@github.com/spurandhar0/nse-btst-signals-dashboard-v2.git /tmp/pub-dashboard
+          cd /tmp/pub-dashboard
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-                                        # Rebase generated files onto the dashboard repository's latest revision.
-          git fetch origin main
-          git rebase origin/main
-          git add docs/
-                                        git fetch origin main
-                                                  git rebase origin/main
-                                                            git add docs/
-          git diff --staged --quiet && echo "Nothing to push to public repo" || git commit -m "Dashboard update: $(date +'%Y-%m-%d')"
-          git push origin main
+
+          # Start each attempt from a clean copy of the latest public revision.
+          # Files are copied only after synchronization, so no rebase sees unstaged changes.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p docs/data
+            cp "${GITHUB_WORKSPACE}/docs/index.html" docs/index.html
+            find "${GITHUB_WORKSPACE}/docs/data" -maxdepth 1 -type f \( -name 'sim_results_C*.json' -o -name 'sim_meta.json' -o -name 'trade_ohlc.json' -o -name 'nifty_index.json' \) -exec cp {} docs/data/ \;
+            git add docs/
+            if git diff --staged --quiet; then
+              echo "Dashboard already up to date"
+              exit 0
+            fi
+            git commit -m "Dashboard update: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            if git push origin HEAD:main; then
+              echo "Dashboard published"
+              exit 0
+            fi
+            echo "Public dashboard changed during publish; retrying (${attempt}/5)"
+            sleep $((attempt * 3))
+          done
+          echo "Dashboard publish could not be completed after 5 conflict-safe attempts"
+          exit 1
 
       - name: Commit private repo data (complete run)
         if: steps.backfill.outputs.exit_code == '0' && steps.simulation.outputs.exit_code == '0'
