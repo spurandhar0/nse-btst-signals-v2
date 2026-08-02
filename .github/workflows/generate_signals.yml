@@ -143,7 +143,7 @@ jobs:
           cd pub-dashboard
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/
+                    # Rebase generated files onto the dashboard repository's latest revision.          git fetch origin main          git rebase origin/maingit add docs/
           git diff --staged --quiet && echo "Nothing to push to public repo" || git commit -m "Dashboard update: $(date +'%Y-%m-%d')"
           git push origin main
 
