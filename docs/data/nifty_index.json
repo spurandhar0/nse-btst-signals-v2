@@ -1,53 +1,53 @@
 {
-  "updated_at": "18-Aug-2026 05:25 PM IST",
+  "updated_at": "19-Aug-2026 05:26 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 24154.9,
-      "prev_close": 24366.0,
-      "open": 24223.85,
-      "high": 24269.65,
-      "low": 24154.9,
-      "change": -211.1,
-      "change_pct": -0.87,
-      "date": "18-Aug-2026"
+      "close": 24078.3,
+      "prev_close": 24154.9,
+      "open": 24152.05,
+      "high": 24172.85,
+      "low": 24025.65,
+      "change": -76.6,
+      "change_pct": -0.32,
+      "date": "19-Aug-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 57262.4,
-      "prev_close": 57491.1,
-      "open": 57325.55,
-      "high": 57584.7,
-      "low": 57217.6,
-      "change": -228.7,
-      "change_pct": -0.4,
-      "date": "18-Aug-2026"
+      "close": 57239.75,
+      "prev_close": 57262.4,
+      "open": 57260.65,
+      "high": 57356.85,
+      "low": 57001.75,
+      "change": -22.65,
+      "change_pct": -0.04,
+      "date": "19-Aug-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 77235.46,
-      "prev_close": 78009.25,
-      "open": 77418.97,
-      "high": 77575.21,
-      "low": 77234.36,
-      "change": -773.79,
-      "change_pct": -0.99,
-      "date": "18-Aug-2026"
+      "close": 76909.68,
+      "prev_close": 77235.46,
+      "open": 77218.05,
+      "high": 77347.81,
+      "low": 76822.89,
+      "change": -325.78,
+      "change_pct": -0.42,
+      "date": "19-Aug-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 30213.45,
-      "prev_close": 31357.75,
-      "open": 30584.1,
-      "high": 30615.45,
-      "low": 30212.95,
-      "change": -1144.3,
-      "change_pct": -3.65,
-      "date": "18-Aug-2026"
+      "close": 30433.05,
+      "prev_close": 30213.45,
+      "open": 30461.1,
+      "high": 30659.8,
+      "low": 30165.0,
+      "change": 219.6,
+      "change_pct": 0.73,
+      "date": "19-Aug-2026"
     }
   ]
 }
