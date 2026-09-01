@@ -1,53 +1,53 @@
 {
-  "updated_at": "31-Aug-2026 11:38 PM IST",
+  "updated_at": "01-Sep-2026 09:04 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 24080.4,
-      "prev_close": 24175.65,
-      "open": 24117.55,
-      "high": 24128.7,
-      "low": 23993.6,
-      "change": -95.25,
-      "change_pct": -0.39,
-      "date": "31-Aug-2026"
+      "close": 24055.8,
+      "prev_close": 24080.4,
+      "open": 24077.55,
+      "high": 24143.15,
+      "low": 23952.55,
+      "change": -24.6,
+      "change_pct": -0.1,
+      "date": "01-Sep-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 58024.95,
-      "prev_close": 57496.3,
-      "open": 57353.75,
-      "high": 58024.95,
-      "low": 57187.35,
-      "change": 528.65,
-      "change_pct": 0.92,
-      "date": "31-Aug-2026"
+      "close": 57409.6,
+      "prev_close": 58024.95,
+      "open": 57560.3,
+      "high": 57766.25,
+      "low": 57150.7,
+      "change": -615.35,
+      "change_pct": -1.06,
+      "date": "01-Sep-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 76957.27,
-      "prev_close": 77264.51,
-      "open": 77130.73,
-      "high": 77177.27,
-      "low": 76751.32,
-      "change": -307.24,
-      "change_pct": -0.4,
-      "date": "31-Aug-2026"
+      "close": 76944.28,
+      "prev_close": 76957.27,
+      "open": 76994.11,
+      "high": 77231.87,
+      "low": 76656.12,
+      "change": -12.99,
+      "change_pct": -0.02,
+      "date": "01-Sep-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 31191.45,
-      "prev_close": 31281.7,
-      "open": 31225.5,
-      "high": 31277.5,
-      "low": 30634.45,
-      "change": -90.25,
-      "change_pct": -0.29,
-      "date": "31-Aug-2026"
+      "close": 31496.7,
+      "prev_close": 31191.45,
+      "open": 31006.25,
+      "high": 31529.2,
+      "low": 30834.1,
+      "change": 305.25,
+      "change_pct": 0.98,
+      "date": "01-Sep-2026"
     }
   ]
 }
