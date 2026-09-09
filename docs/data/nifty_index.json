@@ -1,53 +1,53 @@
 {
-  "updated_at": "08-Sep-2026 08:52 PM IST",
+  "updated_at": "09-Sep-2026 08:47 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 23635.1,
-      "prev_close": 23779.15,
-      "open": 23743.1,
-      "high": 23758.95,
-      "low": 23623.1,
-      "change": -144.05,
-      "change_pct": -0.61,
-      "date": "08-Sep-2026"
+      "close": 23431.5,
+      "prev_close": 23635.1,
+      "open": 23522.05,
+      "high": 23571.55,
+      "low": 23431.5,
+      "change": -203.6,
+      "change_pct": -0.86,
+      "date": "09-Sep-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 56777.55,
-      "prev_close": 57088.3,
-      "open": 56990.4,
-      "high": 57044.0,
-      "low": 56720.45,
-      "change": -310.75,
-      "change_pct": -0.54,
-      "date": "08-Sep-2026"
+      "close": 56295.55,
+      "prev_close": 56777.55,
+      "open": 56498.85,
+      "high": 56743.05,
+      "low": 56295.55,
+      "change": -482.0,
+      "change_pct": -0.85,
+      "date": "09-Sep-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 75577.58,
-      "prev_close": 76132.81,
-      "open": 75970.28,
-      "high": 76012.11,
-      "low": 75553.35,
-      "change": -555.23,
-      "change_pct": -0.73,
-      "date": "08-Sep-2026"
+      "close": 74764.23,
+      "prev_close": 75577.58,
+      "open": 75216.22,
+      "high": 75251.23,
+      "low": 74764.23,
+      "change": -813.35,
+      "change_pct": -1.08,
+      "date": "09-Sep-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 29883.45,
-      "prev_close": 29995.2,
-      "open": 30032.3,
-      "high": 30078.75,
-      "low": 29722.9,
-      "change": -111.75,
-      "change_pct": -0.37,
-      "date": "08-Sep-2026"
+      "close": 28913.95,
+      "prev_close": 29883.5,
+      "open": 29299.55,
+      "high": 29299.55,
+      "low": 28779.8,
+      "change": -969.55,
+      "change_pct": -3.24,
+      "date": "09-Sep-2026"
     }
   ]
 }
