@@ -1,53 +1,53 @@
 {
-  "updated_at": "22-Sep-2026 09:10 PM IST",
+  "updated_at": "23-Sep-2026 09:05 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 23329.0,
+      "close": 23446.8,
       "prev_close": 23414.3,
-      "open": 23454.05,
-      "high": 23489.0,
-      "low": 23285.75,
-      "change": -85.3,
-      "change_pct": -0.36,
-      "date": "22-Sep-2026"
+      "open": 23352.15,
+      "high": 23466.9,
+      "low": 23349.55,
+      "change": 32.5,
+      "change_pct": 0.14,
+      "date": "23-Sep-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 56215.55,
+      "close": 56548.9,
       "prev_close": 56470.65,
-      "open": 56489.9,
-      "high": 56671.1,
-      "low": 56106.95,
-      "change": -255.1,
-      "change_pct": -0.45,
-      "date": "22-Sep-2026"
+      "open": 56209.65,
+      "high": 56623.8,
+      "low": 56209.65,
+      "change": 78.25,
+      "change_pct": 0.14,
+      "date": "23-Sep-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 74529.08,
+      "close": 74828.25,
       "prev_close": 74858.99,
-      "open": 74901.5,
-      "high": 75038.93,
-      "low": 74423.71,
-      "change": -329.91,
-      "change_pct": -0.44,
-      "date": "22-Sep-2026"
+      "open": 74648.32,
+      "high": 74973.74,
+      "low": 74599.88,
+      "change": -30.74,
+      "change_pct": -0.04,
+      "date": "23-Sep-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 28582.1,
+      "close": 28334.05,
       "prev_close": 28830.9,
-      "open": 28810.55,
-      "high": 28824.55,
-      "low": 28332.15,
-      "change": -248.8,
-      "change_pct": -0.86,
-      "date": "22-Sep-2026"
+      "open": 28492.45,
+      "high": 28634.0,
+      "low": 28228.8,
+      "change": -496.85,
+      "change_pct": -1.72,
+      "date": "23-Sep-2026"
     }
   ]
 }
