@@ -1,53 +1,53 @@
 {
-  "updated_at": "08-Oct-2026 11:30 PM IST",
+  "updated_at": "09-Oct-2026 11:04 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 22231.8,
-      "prev_close": 22603.05,
-      "open": 22599.05,
-      "high": 22599.05,
-      "low": 22179.9,
-      "change": -371.25,
-      "change_pct": -1.64,
-      "date": "08-Oct-2026"
+      "close": 22520.45,
+      "prev_close": 22231.8,
+      "open": 22314.95,
+      "high": 22580.75,
+      "low": 22294.75,
+      "change": 288.65,
+      "change_pct": 1.3,
+      "date": "09-Oct-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 54515.05,
-      "prev_close": 55055.55,
-      "open": 55042.9,
-      "high": 55043.0,
-      "low": 54383.15,
-      "change": -540.5,
-      "change_pct": -0.98,
-      "date": "08-Oct-2026"
+      "close": 55256.65,
+      "prev_close": 54515.05,
+      "open": 54746.25,
+      "high": 55419.3,
+      "low": 54617.2,
+      "change": 741.6,
+      "change_pct": 1.36,
+      "date": "09-Oct-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 71593.24,
-      "prev_close": 72638.7,
-      "open": 72668.0,
-      "high": 72693.97,
-      "low": 71327.75,
-      "change": -1045.46,
-      "change_pct": -1.44,
-      "date": "08-Oct-2026"
+      "close": 72472.33,
+      "prev_close": 71593.24,
+      "open": 71776.67,
+      "high": 72669.2,
+      "low": 71739.49,
+      "change": 879.09,
+      "change_pct": 1.23,
+      "date": "09-Oct-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 27736.6,
-      "prev_close": 27757.85,
-      "open": 27920.9,
-      "high": 28378.9,
-      "low": 27658.0,
-      "change": -21.25,
-      "change_pct": -0.08,
-      "date": "08-Oct-2026"
+      "close": 28574.9,
+      "prev_close": 27736.6,
+      "open": 27905.85,
+      "high": 28776.75,
+      "low": 27901.85,
+      "change": 838.3,
+      "change_pct": 3.02,
+      "date": "09-Oct-2026"
     }
   ]
 }
