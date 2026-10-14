@@ -1,53 +1,53 @@
 {
-  "updated_at": "14-Oct-2026 12:00 AM IST",
+  "updated_at": "14-Oct-2026 09:28 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 22363.35,
-      "prev_close": 22520.45,
-      "open": 22593.2,
-      "high": 22651.1,
-      "low": 22304.45,
-      "change": -157.1,
-      "change_pct": -0.7,
-      "date": "12-Oct-2026"
+      "close": 22622.7,
+      "prev_close": 22721.95,
+      "open": 22715.75,
+      "high": 22757.95,
+      "low": 22558.95,
+      "change": -99.25,
+      "change_pct": -0.44,
+      "date": "14-Oct-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 54918.0,
-      "prev_close": 55256.65,
-      "open": 55350.15,
-      "high": 55416.45,
-      "low": 54708.8,
-      "change": -338.65,
-      "change_pct": -0.61,
-      "date": "12-Oct-2026"
+      "close": 55316.0,
+      "prev_close": 55481.05,
+      "open": 55406.7,
+      "high": 55644.7,
+      "low": 55168.2,
+      "change": -165.05,
+      "change_pct": -0.3,
+      "date": "14-Oct-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 71924.68,
-      "prev_close": 72472.33,
-      "open": 72771.32,
-      "high": 72884.25,
-      "low": 71676.1,
-      "change": -547.65,
-      "change_pct": -0.76,
-      "date": "12-Oct-2026"
+      "close": 72781.89,
+      "prev_close": 73033.78,
+      "open": 73049.76,
+      "high": 73195.26,
+      "low": 72578.75,
+      "change": -251.89,
+      "change_pct": -0.34,
+      "date": "14-Oct-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 28349.6,
-      "prev_close": 28574.9,
-      "open": 28688.4,
-      "high": 28822.55,
-      "low": 28213.85,
-      "change": -225.3,
-      "change_pct": -0.79,
-      "date": "12-Oct-2026"
+      "close": 30171.0,
+      "prev_close": 29830.1,
+      "open": 29937.5,
+      "high": 30377.15,
+      "low": 29879.5,
+      "change": 340.9,
+      "change_pct": 1.14,
+      "date": "14-Oct-2026"
     }
   ]
 }
