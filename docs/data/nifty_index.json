@@ -1,53 +1,53 @@
 {
-  "updated_at": "22-Oct-2026 09:31 PM IST",
+  "updated_at": "23-Oct-2026 09:23 PM IST",
   "indices": [
     {
       "label": "NIFTY 50",
       "ticker": "^NSEI",
-      "close": 22687.65,
-      "prev_close": 22811.35,
-      "open": 22687.75,
-      "high": 22784.7,
-      "low": 22554.85,
-      "change": -123.7,
-      "change_pct": -0.54,
-      "date": "22-Oct-2026"
+      "close": 22600.0,
+      "prev_close": 22687.65,
+      "open": 22742.2,
+      "high": 22787.25,
+      "low": 22372.0,
+      "change": -87.65,
+      "change_pct": -0.39,
+      "date": "23-Oct-2026"
     },
     {
       "label": "BANKNIFTY",
       "ticker": "^NSEBANK",
-      "close": 54925.7,
-      "prev_close": 54976.9,
-      "open": 54734.45,
-      "high": 55134.45,
-      "low": 54459.35,
-      "change": -51.2,
-      "change_pct": -0.09,
-      "date": "22-Oct-2026"
+      "close": 54287.35,
+      "prev_close": 54925.7,
+      "open": 54965.75,
+      "high": 54990.5,
+      "low": 53942.35,
+      "change": -638.35,
+      "change_pct": -1.16,
+      "date": "23-Oct-2026"
     },
     {
       "label": "SENSEX",
       "ticker": "^BSESN",
-      "close": 73249.39,
-      "prev_close": 73709.69,
-      "open": 73343.33,
-      "high": 73720.83,
-      "low": 73005.11,
-      "change": -460.3,
-      "change_pct": -0.62,
-      "date": "22-Oct-2026"
+      "close": 73123.83,
+      "prev_close": 73249.39,
+      "open": 73665.64,
+      "high": 73766.51,
+      "low": 72452.37,
+      "change": -125.56,
+      "change_pct": -0.17,
+      "date": "23-Oct-2026"
     },
     {
       "label": "NIFTY IT",
       "ticker": "^CNXIT",
-      "close": 32081.25,
-      "prev_close": 32422.5,
-      "open": 32379.7,
-      "high": 32569.3,
-      "low": 31841.3,
-      "change": -341.25,
-      "change_pct": -1.05,
-      "date": "22-Oct-2026"
+      "close": 31995.5,
+      "prev_close": 32081.25,
+      "open": 32728.85,
+      "high": 33138.6,
+      "low": 31144.3,
+      "change": -85.75,
+      "change_pct": -0.27,
+      "date": "23-Oct-2026"
     }
   ]
 }
