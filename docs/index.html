@@ -3079,13 +3079,19 @@ document.addEventListener('keydown', e=>{
 });
 // ─── OVERVIEW ────────────────────────────────────────────────────────────────
 function buildOverview(){
+  // Group once instead of scanning every signal for each of 1,925 configs.
+  const rowsByConfig = new Map();
+  ALL_ROWS.forEach(r=>{
+    if(!rowsByConfig.has(r.CONFIG)) rowsByConfig.set(r.CONFIG,[]);
+    rowsByConfig.get(r.CONFIG).push(r);
+  });
   const allCfgIds = CONFIGS_DEF.map(c=>c.id||c.ID).filter(Boolean).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
   const cfgIds = ovCfg==='ALL' ? allCfgIds : [ovCfg];
   let totExec=0,totOpen=0,totClosed=0,totPnl=0,totPT=0,totLoss=0;
   const rows=[];
 
   cfgIds.forEach(cid=>{
-    let crows=ALL_ROWS.filter(r=>r.CONFIG===cid);
+    let crows=rowsByConfig.get(cid)||[];
     if(dateRangeActive) crows=crows.filter(r=>inDateRange(r.SIGNAL_DATE));
 
     const exec=crows.filter(r=>r.ORDER==='Executed');
@@ -3677,41 +3683,81 @@ function applyCfgSelect(){
   reloadDataForConfigs();
 }
 
-function reloadDataForConfigs(){
-  ALL_ROWS = [];
-  var banner = document.getElementById('liveBanner');
-  if(banner) banner.innerHTML = '&#8987; Loading trade data&hellip;';
-  var configIds = [];
-  if(_cfgTabActive !== 'ALL'){
-    configIds = _cfgTabActive.split(',').filter(function(id){ return id.trim() !== ''; });
+// Bounded data loader: do not start one network request per configuration.
+var _btstLoadVersion = 0;
+var _btstLoadController = null;
+async function btstFetchJson(url, signal){
+  for(var attempt=0; attempt<3; attempt++){
+    if(signal.aborted) throw new DOMException('Load superseded', 'AbortError');
+    var requestController = new AbortController();
+    var cancel = function(){ requestController.abort(); };
+    signal.addEventListener('abort', cancel, {once:true});
+    var timer = setTimeout(cancel, 60000);
+    try{
+      var response = await fetch(url, {signal:requestController.signal});
+      if(!response.ok){
+        var httpError = new Error(url+' (HTTP '+response.status+')');
+        httpError.noRetry = response.status >= 400 && response.status < 500 && response.status !== 408 && response.status !== 429;
+        throw httpError;
+      }
+      return await response.json();
+    }catch(error){
+      if(signal.aborted) throw new DOMException('Load superseded', 'AbortError');
+      if(attempt===2 || error.noRetry) throw new Error('Could not load '+url+': '+error.message);
+    }finally{
+      clearTimeout(timer);
+      signal.removeEventListener('abort', cancel);
+    }
+    await new Promise(function(resolve){ setTimeout(resolve, 500*Math.pow(2,attempt)); });
   }
+}
+async function btstLoadConfigs(configIds, signal, onProgress){
+  var next=0, completed=0, rowsByConfig=new Array(configIds.length), failure=null;
+  async function worker(){
+    while(next<configIds.length && !failure && !signal.aborted){
+      var index=next++, cid=configIds[index];
+      try{
+        var data=await btstFetchJson('data/sim_results_'+encodeURIComponent(cid)+'.json', signal);
+        if(!Array.isArray(data.signals)) throw new Error('Invalid signals in configuration '+cid);
+        rowsByConfig[index]=data.signals;
+        completed++;
+        onProgress(completed,configIds.length);
+      }catch(error){ failure=error; }
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(6,configIds.length)},worker));
+  if(failure) throw failure;
+  if(signal.aborted) throw new DOMException('Load superseded', 'AbortError');
+  var rows=[];
+  rowsByConfig.forEach(function(signals){ for(var row of signals) rows.push(row); });
+  return rows;
+}
+
+function reloadDataForConfigs(){
+  var version=++_btstLoadVersion;
+  if(_btstLoadController) _btstLoadController.abort();
+  var controller=new AbortController();
+  _btstLoadController=controller;
+  var banner=document.getElementById('liveBanner');
+  var hadData=_dataReady;
+  if(banner) banner.textContent='⏳ Loading trade data…';
+  var selection=_cfgTabActive;
   (async function(){
     try{
-      // Fetch sim_meta first — get only configs that have results (avoids 404 storm)
-      var simMeta = {};
-      try{
-        var metaRes = await fetch('data/sim_meta.json');
-        if(metaRes.ok) simMeta = await metaRes.json();
-      } catch(e){}
-      if(_cfgTabActive === 'ALL'){
-        configIds = simMeta.configs || CONFIGS_DEF.map(function(c){ return c.id; });
-      }
-      var allFetches = [
-        ...configIds.map(function(cid){ return fetch('data/sim_results_'+cid+'.json'); }),
-        fetch('data/trade_ohlc.json'),
-      ];
-      var allResults = await Promise.all(allFetches);
-      var totalSignals = 0;
-      for(var i = 0; i < configIds.length; i++){
-        var res = allResults[i];
-        var cid = configIds[i];
-        if(!res.ok){ console.warn('sim_results_'+cid+'.json not found'); continue; }
-        var data = await res.json();
-        var signals = data.signals || [];
-        for(var r of signals){ ALL_ROWS.push(r); totalSignals++; }
-      }
-      var ohlcRes = allResults[configIds.length];
-      if(ohlcRes.ok) TRADE_OHLC = await ohlcRes.json();
+      var simMeta=await btstFetchJson('data/sim_meta.json',controller.signal);
+      if(!Array.isArray(simMeta.configs)) throw new Error('Invalid configuration list in sim_meta.json');
+      var configIds=selection==='ALL' ? simMeta.configs : selection.split(',').filter(function(id){return id.trim()!=='';});
+      var loadedRows=await btstLoadConfigs(configIds,controller.signal,function(done,total){
+        if(version===_btstLoadVersion && banner) banner.textContent='⏳ Loading configurations: '+done+' / '+total;
+      });
+      if(version!==_btstLoadVersion) return;
+      if(banner) banner.textContent='⏳ Loading price history…';
+      var loadedOhlc=await btstFetchJson('data/trade_ohlc.json',controller.signal);
+      if(version!==_btstLoadVersion) return;
+      // Commit only a complete load. Never display incomplete totals as success.
+      ALL_ROWS=loadedRows;
+      TRADE_OHLC=loadedOhlc;
+      var totalSignals=loadedRows.length;
       _dataReady = true;
       try{
         var ddEl = document.getElementById('bannerDataDate');
@@ -3740,8 +3786,10 @@ function reloadDataForConfigs(){
         ? '&#10003; Data loaded: ' + totalSignals + ' signals'
         : '<span style="color:#d97706">&#9888; No trade data found. Run the Generate Signal workflow first.</span>';
     }catch(err){
+      if(version!==_btstLoadVersion) return;
+      controller.abort();
       console.error('Data reload failed:', err);
-      if(banner) banner.innerHTML = '<span style="color:#dc2626">&#9888; Error loading data: '+err.message+'</span>';
+      if(banner) banner.textContent='⚠ Data load incomplete: '+err.message+(hadData?' — Previous data retained; it does not represent the new selection.':' — No totals displayed.')+' Use Refresh to retry.';
     }
   })();
 }
