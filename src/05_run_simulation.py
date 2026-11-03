@@ -1,3 +1,9 @@
+from sim_checkpoint import file_digest, generation_id, checkpoint_matches, resumable_configs, write_json_atomic, validate_publication
+SIM_GENERATION = None
+SIM_SIGNATURES = {}
+SIM_EXPECTED = []
+SIM_RESUMABLE = set()
+
 """
 Script 5: Run Simulation for All 4 Configs
 ============================================
@@ -652,6 +658,7 @@ def export_sim_json(consolidated_data, price_dict, global_last_date):
     meta = {
         'generated_at': datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST'),
         'last_date':    str(global_last_date.date()),
+        'generation': SIM_GENERATION,
     }
 
     os.makedirs('docs/data', exist_ok=True)
@@ -767,12 +774,11 @@ def export_sim_json(consolidated_data, price_dict, global_last_date):
 
         # ── Write per-config JSON ─────────────────────────────────────────────
         per_cfg = {
-            'meta':    {**meta, 'config': cid},
+            'meta':    {**meta, 'config': cid, 'signal_signature': SIM_SIGNATURES[cid]},
             'signals': config_rows,
         }
         cfg_path = f'docs/data/sim_results_{cid}.json'
-        with open(cfg_path, 'w') as f:
-            json.dump(per_cfg, f, default=str)
+        write_json_atomic(cfg_path, per_cfg)
         cfg_kb = os.path.getsize(cfg_path) / 1024
         print(f"✅ Exported {cfg_path}  ({cfg_kb:,.0f} KB, {len(config_rows):,} signals)")
         config_list.append(cid)
@@ -783,7 +789,8 @@ def export_sim_json(consolidated_data, price_dict, global_last_date):
         for fn in sorted(os.listdir('docs/data')):
             if fn.startswith('sim_results_') and fn.endswith('.json'):
                 ecid = fn.replace('sim_results_', '').replace('.json', '')
-                if ecid not in config_list:
+                if (ecid in SIM_RESUMABLE and ecid not in config_list and
+                        checkpoint_matches(os.path.join('docs/data', fn), SIM_GENERATION, SIM_SIGNATURES[ecid])):
                     existing_cfgs.append(ecid)
     if existing_cfgs:
         print(f"  📍 Merging {len(existing_cfgs)} previously completed configs into sim_meta")
@@ -795,20 +802,26 @@ def export_sim_json(consolidated_data, price_dict, global_last_date):
         try:
             with open(ohlc_path) as f:
                 prev_ohlc = json.load(f)
-            prev_ohlc.update(ohlc_out)   # new keys overwrite old ones
+            # Retain only price histories from matching checkpoints. Never mix
+            # old generations or obsolete exits into a newly computed snapshot.
+            retained_configs = set(existing_cfgs)
+            prev_ohlc = {key: value for key, value in prev_ohlc.items()
+                         if key.rsplit('_', 1)[-1] in retained_configs}
+            prev_ohlc.update(ohlc_out)
             ohlc_out = prev_ohlc
-        except Exception:
-            pass  # if corrupt, just use what we have
+        except (OSError, ValueError) as exc:
+            raise ValueError('Cannot safely merge checkpoint trade history') from exc
 
     # ── sim_meta.json ──────────────────────────────────────────────────────────
-    sim_meta = {**meta, 'configs': config_list}
-    with open('docs/data/sim_meta.json', 'w') as f:
-        json.dump(sim_meta, f)
+    sim_meta = {**meta, 'configs': config_list, 'expected_configs': SIM_EXPECTED}
     print(f"✅ Exported docs/data/sim_meta.json  (configs: {config_list})")
 
     # ── trade_ohlc.json (MTF filtered, combined) ───────────────────────────────
-    with open('docs/data/trade_ohlc.json', 'w') as f:
-        json.dump(ohlc_out, f, default=str)
+    write_json_atomic('docs/data/trade_ohlc.json', ohlc_out)
+    # Commit marker comes last. An interrupted export must never be resumable
+    # with new config files but missing/older price histories.
+    sim_meta['ohlc_digest'] = file_digest('docs/data/trade_ohlc.json')
+    write_json_atomic('docs/data/sim_meta.json', sim_meta)
     ohlc_kb = os.path.getsize('docs/data/trade_ohlc.json') / 1024
     print(f"✅ Exported docs/data/trade_ohlc.json   ({ohlc_kb:,.0f} KB, {len(ohlc_out):,} keys)")
     total_kb = sum(os.path.getsize(f'docs/data/sim_results_{c}.json') for c in config_list) / 1024
@@ -856,14 +869,18 @@ def main():
     month_dir = os.path.join(OUTPUT_DIR, global_last_date.strftime("%Y-%m"))
     os.makedirs(month_dir, exist_ok=True)
 
-    # ── Checkpoint: find configs already done in a previous partial run ─────────
-    done_configs = set()
-    if os.path.isdir('docs/data'):
-        for fn in os.listdir('docs/data'):
-            if fn.startswith('sim_results_') and fn.endswith('.json'):
-                done_configs.add(fn.replace('sim_results_', '').replace('.json', ''))
-    if done_configs:
-        print(f"\n📍 Checkpoint resume: {len(done_configs)} configs already done — skipping them")
+    global SIM_GENERATION, SIM_SIGNATURES, SIM_EXPECTED, SIM_RESUMABLE
+    SIM_EXPECTED = [c['id'] for c in configs]
+    SIM_GENERATION = generation_id(global_last_date.date(), [
+        EQ_FILE, CONFIG_FILE, 'docs/data/mtf_symbols.json', __file__,
+        os.path.join(os.path.dirname(__file__), 'sim_checkpoint.py'),
+    ])
+    SIM_SIGNATURES = {cid: file_digest(os.path.join(DB_DIR, 'signals_' + cid + '.parquet'))
+                      for cid in SIM_EXPECTED}
+    SIM_RESUMABLE = resumable_configs('docs/data', SIM_GENERATION)
+    done_configs = {cid for cid in SIM_EXPECTED if cid in SIM_RESUMABLE and checkpoint_matches(
+        'docs/data/sim_results_' + cid + '.json', SIM_GENERATION, SIM_SIGNATURES[cid])}
+    print(f"Checkpoint generation {SIM_GENERATION[:12]}: {len(done_configs)}/{len(configs)} current; old dates are recomputed")
 
     consolidated_data = []
     time_budget_hit   = False
@@ -893,6 +910,8 @@ def main():
         signals_path = os.path.join(DB_DIR, f"signals_{cid}.parquet")
         if not os.path.exists(signals_path):
             print(f"\n⚠️  {cid}: no signals file found ({signals_path}) — skipping")
+            # A configuration that has never matched legitimately has no parquet.
+            consolidated_data.append((cid, get_picks_columns(max_buys), []))
             continue
 
         print(f"\n{'─'*60}")
@@ -984,6 +1003,7 @@ def main():
         print(f"⏰ Partial run — will auto-resume next run — {datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST')}")
         sys.exit(2)
     else:
+        validate_publication()
         print(f"✅ Simulation complete — {datetime.now(tz=IST).strftime('%d-%b-%Y %H:%M IST')}")
         print(f"Output folder: {month_dir}")
         sys.exit(0)

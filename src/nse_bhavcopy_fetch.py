@@ -1,90 +1,95 @@
-"""
-NSE Bhavcopy Fetcher
-=====================
-Downloads today's NSE EQ bhavcopy and saves to bhav_data/
-Outputs GitHub Actions step output: new_file=true/false
-"""
+"""Fetch missing recent NSE sessions, validate dates, fail closed on missing data.
 
-import os, glob, requests
+NSE holidays are accepted only from its official holiday-master response.
+No filename, HTML response, or HTTP success alone proves valid market data.
+"""
+import io
+import os
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-IST     = timezone(timedelta(hours=5, minutes=30))
-NOW_IST = datetime.now(tz=IST)
-BHAV_ROOT = "bhav_data"
+import pandas as pd
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-
-def set_gha_output(key, value):
-    gha_output = os.environ.get("GITHUB_OUTPUT", "")
-    if gha_output:
-        with open(gha_output, "a") as f:
-            f.write(f"{key}={value}\n")
+IST = timezone(timedelta(hours=5, minutes=30))
+HEADERS = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.nseindia.com'}
 
 
-def fetch_bhav():
-    dd   = NOW_IST.strftime("%d")
-    mm   = NOW_IST.strftime("%m")
-    yyyy = NOW_IST.strftime("%Y")
-    mon3 = NOW_IST.strftime("%b")
+def validate_csv(content, expected):
+    data = pd.read_csv(io.BytesIO(content))
+    data.columns = data.columns.str.strip()
+    required = {'SYMBOL', 'SERIES', 'DATE1', 'CLOSE_PRICE', 'OPEN_PRICE', 'LOW_PRICE', 'HIGH_PRICE'}
+    if not required.issubset(data.columns) or len(data) < 100:
+        raise ValueError('Invalid/empty NSE bhavcopy; required columns or rows missing')
+    dates = pd.to_datetime(data['DATE1'].str.strip(), dayfirst=True, errors='raise').dt.date
+    if set(dates) != {expected}:
+        raise ValueError(f'Bhavcopy date does not match requested session {expected}')
 
-    fname    = f"sec_bhavdata_full_{dd}{mm}{yyyy}.csv"
-    savepath = os.path.join(BHAV_ROOT, fname)
 
-    date_pattern = f"*_{dd}{mm}{yyyy}.csv"
-    existing = (
-        glob.glob(os.path.join(BHAV_ROOT, "**", date_pattern), recursive=True)
-        + glob.glob(os.path.join(BHAV_ROOT, date_pattern))
-    )
-    existing = list(set(existing))
+def target_session(now):
+    # Scheduled at 20:00 IST; manual runs before market close use prior day.
+    target = now.date()
+    if now.hour < 16:
+        target -= timedelta(days=1)
+    while target.weekday() >= 5:
+        target -= timedelta(days=1)
+    return target
 
-    if existing:
-        print(f"\u26a0\ufe0f  File for {dd}-{mon3}-{yyyy} already exists: {existing[0]}")
-        print("\u23ed\ufe0f  Skipping download.")
-        set_gha_output("new_file", "false")
-        return False
 
-    url = (
-        f"https://nsearchives.nseindia.com/products/content/"
-        f"sec_bhavdata_full_{dd}{mm}{yyyy}.csv"
-    )
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/124.0.0.0 Safari/537.36",
-        "Referer": "https://www.nseindia.com",
-        "Accept": "text/html,application/xhtml+xml,*/*",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
+def main():
+    now = datetime.now(IST)
+    target = target_session(now)
+    root = Path('bhav_data')
+    root.mkdir(exist_ok=True)
+    last = None
+    if Path('db/eq_data.parquet').exists():
+        last = pd.to_datetime(pd.read_parquet('db/eq_data.parquet', columns=['DATE1'])['DATE1']).max().date()
+    start = last + timedelta(days=1) if last else target
+    if (target - start).days > 31:
+        raise RuntimeError('Over 31 days of data missing; run historical bhav backfill first')
     session = requests.Session()
-    print("Getting NSE session cookies...")
-    session.get("https://www.nseindia.com", headers=headers, timeout=20)
+    retry = Retry(total=3, backoff_factor=2, status_forcelist=[429, 500, 502, 503, 504])
+    session.mount('https://', HTTPAdapter(max_retries=retry))
+    holidays = set()
+    try:
+        session.get('https://www.nseindia.com', headers=HEADERS, timeout=30)
+        response = session.get('https://www.nseindia.com/api/holiday-master?type=trading', headers=HEADERS, timeout=30)
+        response.raise_for_status()
+        for item in response.json().get('CM', []):
+            holidays.add(datetime.strptime(item['tradingDate'], '%d-%b-%Y').date())
+    except (requests.RequestException, ValueError, KeyError):
+        print('Holiday calendar unavailable; missing weekday files will fail, not publish stale data')
+    new_files = 0
+    date = start
+    while date <= target:
+        if date.weekday() >= 5 or date in holidays:
+            print('Non-trading date:', date)
+            date += timedelta(days=1)
+            continue
+        name = 'sec_bhavdata_full_' + date.strftime('%d%m%Y') + '.csv'
+        path = root / name
+        if path.exists():
+            content = path.read_bytes()
+        else:
+            response = session.get('https://nsearchives.nseindia.com/products/content/' + name,
+                                   headers=HEADERS, timeout=60)
+            response.raise_for_status()
+            content = response.content
+        validate_csv(content, date)
+        temporary = path.with_suffix('.tmp')
+        temporary.write_bytes(content)
+        temporary.replace(path)
+        new_files += 1
+        print('Validated NSE session:', date)
+        date += timedelta(days=1)
+    print(f'NSE fetch complete: {new_files} session files; previous EQ date={last}; requested through={target}')
+    output = os.environ.get('GITHUB_OUTPUT')
+    if output:
+        with open(output, 'a') as handle:
+            handle.write(f'new_file={str(new_files > 0).lower()}\n')
 
-    print(f"Downloading bhav: {url}")
-    resp = session.get(url, headers=headers, timeout=60)
 
-    if resp.status_code != 200:
-        print(f"\u274c NSE Bhavcopy FAILED \u2014 HTTP {resp.status_code}")
-        print(f"   NSE may not have published today's bhavcopy yet.")
-        set_gha_output("new_file", "false")
-        return False
-
-    os.makedirs(BHAV_ROOT, exist_ok=True)
-    with open(savepath, "wb") as f:
-        f.write(resp.content)
-
-    size_kb = os.path.getsize(savepath) / 1024
-    with open(savepath, "r") as f:
-        row_count = sum(1 for _ in f) - 1
-
-    print(f"\u2705 Saved   : {savepath} ({size_kb:.1f} KB)")
-    print(f"\u2705 Date    : {dd}-{mon3}-{yyyy}")
-    print(f"\u2705 Rows    : {row_count:,}")
-    set_gha_output("new_file", "true")
-    return True
-
-
-if __name__ == "__main__":
-    print("=" * 50)
-    print(f"NSE Bhavcopy Fetch | {NOW_IST.strftime('%d-%b-%Y %H:%M IST')}")
-    print("=" * 50)
-    os.makedirs(BHAV_ROOT, exist_ok=True)
-    fetch_bhav()
+if __name__ == '__main__':
+    main()
