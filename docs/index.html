@@ -138,6 +138,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 .fo-badge{background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;white-space:nowrap}
 
 
+.config-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0}.config-tools input{padding:9px;border:1px solid #cbd5e1;border-radius:7px;max-width:100%;min-width:220px}.selection-count{background:#153d82;color:#fff!important;border-radius:20px;padding:7px 14px;display:inline-block}#tab-configs .table-area{max-height:65vh}#tcfg-page-info,#overview-page-info{white-space:normal;font-size:12px}#saved-config-summary{font-size:12px;color:#153d82;font-weight:700;padding:6px 10px}@media(max-width:600px){.config-tools{gap:8px}.config-tools input{min-width:0;width:100%}.pager{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -212,30 +213,31 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   <div class="tab" onclick="showTab('portfolio',this)">&#128197; Portfolio</div>
 </div>
 
+<p id="saved-config-summary" aria-live="polite"></p>
 <div id="tab-overview">
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:10px 0 0 0;">
       <span class="slbl">CONFIG:</span>
-      <button class="btn-filter active" onclick="ovCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="ovCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-overview-all" onclick="setPageConfig('overview','ALL')">All</button><button class="btn-filter" id="cfgf-overview-sel" onclick="openTabCfgPicker('overview')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
 <div id="ov-stats" class="stat-grid"></div>
@@ -252,14 +254,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       </table>
     </div>
   </div>
+<div class="pager"><label>Rows per page <select id="overview-pgsize" onchange="overviewPageSize(this.value)"><option selected>25</option><option>50</option><option>100</option></select></label><button id="overview-prev" class="btn-sm btn-outline" onclick="overviewChangePage(-1)">← Prev</button><span id="overview-page-info" aria-live="polite"></span><button id="overview-next" class="btn-sm btn-outline" onclick="overviewChangePage(1)">Next →</button></div>
 </div>
 
 <div id="tab-open" class="hidden">
   <div class="tab-badges" id="open-badges"></div>
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-open-all" onclick="cfgFilter('open','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-open-sel" onclick="openTabCfgPicker('open')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-open-all" onclick="setPageConfig('open','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-open-sel" onclick="openTabCfgPicker('open')">Choose Configuration</button>
     <span id="cfgf-open-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex:1"></div>
@@ -299,8 +302,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   <div class="tab-badges" id="fno-badges"></div>
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-fno-all" onclick="cfgFilter('fno','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-fno-sel" onclick="openTabCfgPicker('fno')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-fno-all" onclick="setPageConfig('fno','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-fno-sel" onclick="openTabCfgPicker('fno')">Choose Configuration</button>
     <span id="cfgf-fno-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex:1"></div>
@@ -340,8 +343,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   <div class="tab-badges" id="fnoclosed-badges"></div>
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-fnoclosed-all" onclick="cfgFilter('fnoclosed','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-fnoclosed-sel" onclick="openTabCfgPicker('fnoclosed')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-fnoclosed-all" onclick="setPageConfig('fnoclosed','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-fnoclosed-sel" onclick="openTabCfgPicker('fnoclosed')">Choose Configuration</button>
     <span id="cfgf-fnoclosed-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
@@ -386,8 +389,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   <div class="tab-badges" id="closed-badges"></div>
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-closed-all" onclick="cfgFilter('closed','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-closed-sel" onclick="openTabCfgPicker('closed')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-closed-all" onclick="setPageConfig('closed','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-closed-sel" onclick="openTabCfgPicker('closed')">Choose Configuration</button>
     <span id="cfgf-closed-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
@@ -604,8 +607,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   <div class="tab-badges" id="fe-badges"></div>
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-fe-all" onclick="cfgFilter('fe','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-fe-sel" onclick="openTabCfgPicker('fe')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-fe-all" onclick="setPageConfig('fe','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-fe-sel" onclick="openTabCfgPicker('fe')">Choose Configuration</button>
     <span id="cfgf-fe-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex:1"></div>
@@ -650,8 +653,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <button class="btn-filter" id="hist-status-Closed" onclick="statusFilterHist('Closed',this)">Sold</button>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-hist-all" onclick="cfgFilter('hist','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-hist-sel" onclick="openTabCfgPicker('hist')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-hist-all" onclick="setPageConfig('hist','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-hist-sel" onclick="openTabCfgPicker('hist')">Choose Configuration</button>
     <span id="cfgf-hist-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
   </div>
@@ -669,8 +672,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 <div id="tab-ledger" class="hidden">
   <div class="cstrip">
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-ledger-all" onclick="cfgFilter('ledger','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-ledger-sel" onclick="openTabCfgPicker('ledger')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-ledger-all" onclick="setPageConfig('ledger','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-ledger-sel" onclick="openTabCfgPicker('ledger')">Choose Configuration</button>
     <span id="cfgf-ledger-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
@@ -717,8 +720,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     <button class="btn-teal btn-sm" onclick="exportCSVTab('trades')">&#8595; CSV</button>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     <span class="slbl">Config:</span>
-    <button class="btn-filter active" id="cfgf-trades-all" onclick="cfgFilter('trades','ALL',this)">All</button>
-    <button class="btn-filter" id="cfgf-trades-sel" onclick="openTabCfgPicker('trades')">&#9881; Show All</button>
+    <button class="btn-filter active" id="cfgf-trades-all" onclick="setPageConfig('trades','ALL')">All</button>
+    <button class="btn-filter" id="cfgf-trades-sel" onclick="openTabCfgPicker('trades')">Choose Configuration</button>
     <span id="cfgf-trades-badge" style="display:none;background:#1d4ed8;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;margin-left:2px;"></span>
     <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
   </div>
@@ -751,7 +754,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   </div>
 </div>
 
-<div id="tab-signals" class="hidden">
+<div id="tab-signals" class="hidden"><div class="cstrip"><span class="slbl">Config:</span><button class="btn-filter active" id="cfgf-signals-all" onclick="setPageConfig('signals','ALL')">All</button><button class="btn-filter" id="cfgf-signals-sel" onclick="openTabCfgPicker('signals')">Choose Configuration</button></div>
   <div class="tab-badges" id="sig-total-badges" style="margin-bottom:12px;"></div>
   <div class="cstrip">
     <span class="slbl">Status:</span>
@@ -792,61 +795,33 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
   </div>
 </div>
 
-<div id="cfg-select-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:14px;padding:28px 32px;max-width:660px;width:96%;box-shadow:0 8px 40px rgba(0,0,0,.5);position:relative;">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
-      <div>
-        <h3 style="margin:0;font-size:17px;color:var(--navy);font-weight:700;">&#9881; Select Configurations</h3>
-        <div id="cfg-sel-count" style="font-size:13px;color:var(--text3);margin-top:3px;"></div>
-      </div>
-      <button onclick="closeCfgSelectModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1;padding:4px 8px;">&#x2715;</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button onclick="cfgSelAll()" style="padding:6px 18px;border-radius:8px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Select All</button>
-      <button onclick="cfgSelClear()" style="padding:6px 18px;border-radius:8px;border:2px solid #ef4444;background:transparent;color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;">Clear All</button>
-    </div>
-    <div id="cfg-sel-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;max-height:240px;overflow-y:auto;"></div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);padding-top:16px;">
-      <button onclick="closeCfgSelectModal()" style="padding:8px 22px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
-      <button onclick="applyCfgSelect()" style="padding:8px 22px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Apply &amp; Save</button>
-    </div>
-  </div>
-</div>
-
 <div id="tab-configs" class="hidden">
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px 0;">
-    
-    <label style="font-size:13px;color:var(--text2);">Rows per page:
-      <select id="configs-pgsize" onchange="renderConfigsPage()" style="margin-left:4px;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text1);font-size:13px;">
-        <option value="10">10</option>
-        <option value="25" selected>25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-        <option value="999999">All</option>
-      </select>
-    </label>
-    <button class="btn-filter" id="configs-prev" onclick="configsChangePage(-1)" disabled>&#8592; Prev</button>
-    <span id="configs-page-info" style="font-size:13px;color:var(--text2);min-width:160px;text-align:center;">Page 1</span>
-    <button class="btn-filter" id="configs-next" onclick="configsChangePage(1)">Next &#8594;</button>
+  <h2>Configurations — Select &amp; Save</h2>
+  <p>Choose which configurations load across the dashboard. Changes take effect only on Save. Tab filters use this saved selection.</p>
+  <div class="config-tools">
+    <input id="configs-search" type="search" placeholder="Search configuration ID or name" aria-label="Search configurations" oninput="_cfgPage=1;renderConfigsPage()">
+    <button class="btn-filter" onclick="configDraftAll(true)">Select All</button>
+    <button class="btn-filter" onclick="configDraftAll(false)">Clear All</button>
+    <strong id="config-selected-count" class="selection-count" aria-live="polite"></strong>
+    <button class="btn-sm btn-outline" onclick="cancelConfigsPage()">Cancel</button>
+    <button class="btn-sm" style="background:#0d1f3c;color:#fff" onclick="saveConfigsPage()">Save Selection</button>
+  </div>
+  <p id="config-save-status" role="status"></p>
+  <div class="pager">
+    <label>Rows per page <select id="configs-pgsize" onchange="_cfgPage=1;renderConfigsPage()"><option>10</option><option selected>25</option><option>50</option><option>100</option></select></label>
+    <button class="btn-filter" id="configs-prev" onclick="configsChangePage(-1)">← Prev</button>
+    <span id="configs-page-info" aria-live="polite"></span>
+    <button class="btn-filter" id="configs-next" onclick="configsChangePage(1)">Next →</button>
   </div>
   <div class="table-area">
     <table id="cfg-params-table" class="ov-table"><thead><tr>
-      <th>CONFIG</th><th>DAYS BACK</th><th>PCT MIN</th><th>PCT MAX</th>
+      <th>SELECT</th><th>CONFIG</th><th>DAYS BACK</th><th>PCT MIN</th><th>PCT MAX</th>
       <th>ATH MIN</th><th>ATH MAX</th><th>MAX BUYS</th><th>BUY DROP</th>
       <th>TARGET</th><th>STOP LOSS</th><th>MAX DURATION</th>
-    </tr></thead>
-    <tbody id="cfg-params-body"></tbody>
-    </table>
+    </tr></thead><tbody id="cfg-params-body"></tbody></table>
   </div>
-  <div style="margin-top:20px;padding:16px;background:#f8faff;border-radius:10px;border:1.5px solid #c7d7fe;font-size:13px;color:var(--text2);line-height:1.8">
-    <strong>DAYS BACK:</strong> Look-back window for N-day low &nbsp;&bull;&nbsp;
-    <strong>PCT MIN/MAX:</strong> % change from N-day low range &nbsp;&bull;&nbsp;
-    <strong>ATH MIN/MAX:</strong> % from All-Time-High range<br>
-    <strong>MAX BUYS:</strong> Max averaging positions &nbsp;&bull;&nbsp;
-    <strong>BUY DROP:</strong> Drop % to trigger next buy &nbsp;&bull;&nbsp;
-    <strong>TARGET/SL:</strong> Exit thresholds &nbsp;&bull;&nbsp;
-    <strong>MAX DURATION:</strong> Max holding days
-  </div>
+  <p>Select All and Clear All affect every available configuration, including other pages and search results. Selection is saved in this browser; portfolio records are unchanged.</p>
+  <p><strong>Days back:</strong> low look-back window · <strong>Pct min/max:</strong> change from N-day low · <strong>ATH min/max:</strong> distance from all-time high · <strong>Max buys:</strong> averaging positions · <strong>Buy drop:</strong> averaging threshold · <strong>Target/stop:</strong> exit thresholds · <strong>Max duration:</strong> holding days.</p>
 </div>
 
 <div id="tab-disclaimer" class="hidden">
@@ -873,27 +848,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
       <span class="slbl">CONFIG:</span>
-      <button class="btn-filter active" onclick="avgTrigCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="avgTrigCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-avgtrigger-all" onclick="setPageConfig('avgtrigger','ALL')">All</button><button class="btn-filter" id="cfgf-avgtrigger-sel" onclick="openTabCfgPicker('avgtrigger')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
     <div id="avgtrigger-badges" class="tab-badges"></div>
@@ -929,27 +904,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
       <span class="slbl">CONFIG:</span>
-      <button class="btn-filter active" onclick="sellTrigCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="sellTrigCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-selltrigger-all" onclick="setPageConfig('selltrigger','ALL')">All</button><button class="btn-filter" id="cfgf-selltrigger-sel" onclick="openTabCfgPicker('selltrigger')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">  <div id="selltrigger-badges" class="tab-badges" style="flex:1;min-width:0;"></div>  <input id="selltrig-search" type="text" placeholder="🔍 Search symbol..." oninput="renderSellTrigger()" style="padding:4px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:12px;width:160px;outline:none;">  <button class="btn-sm btn-green" onclick="exportTabCSV('selltrigger')">Export CSV</button></div>
@@ -976,27 +951,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
       <span class="slbl">Config:</span>
-      <button class="btn-filter active" onclick="avgHistCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="avgHistCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-avghistory-all" onclick="setPageConfig('avghistory','ALL')">All</button><button class="btn-filter" id="cfgf-avghistory-sel" onclick="openTabCfgPicker('avghistory')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
@@ -1034,27 +1009,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <span style="font-size:12px;color:var(--text3);">All open positions with latest price & P&amp;L</span>
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
       <span class="slbl">Config:</span>
-      <button class="btn-filter active" onclick="mdCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="mdCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-marketdata-all" onclick="setPageConfig('marketdata','ALL')">All</button><button class="btn-filter" id="cfgf-marketdata-sel" onclick="openTabCfgPicker('marketdata')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
     <div id="marketdata-badges" class="tab-badges"></div>
@@ -1087,27 +1062,27 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <span style="font-size:12px;color:var(--text3);">Deep dive into closed and open trade statistics</span>
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
       <span class="slbl">Config:</span>
-      <button class="btn-filter active" onclick="perfCfgFilter('ALL',this)">All</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C1',this)">C1</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C2',this)">C2</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C3',this)">C3</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C4',this)">C4</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C5',this)">C5</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C6',this)">C6</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C7',this)">C7</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C8',this)">C8</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C9',this)">C9</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C10',this)">C10</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C11',this)">C11</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C12',this)">C12</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C13',this)">C13</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C14',this)">C14</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C15',this)">C15</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C16',this)">C16</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C17',this)">C17</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C18',this)">C18</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C19',this)">C19</button>
-      <button class="btn-filter" onclick="perfCfgFilter('C20',this)">C20</button>
+      <button class="btn-filter active" id="cfgf-performance-all" onclick="setPageConfig('performance','ALL')">All</button><button class="btn-filter" id="cfgf-performance-sel" onclick="openTabCfgPicker('performance')">Choose Configuration</button>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       <div style="flex-basis:100%;height:0;margin:0;padding:0"></div>
     </div>
     <div id="perf-hero" class="perf-hero"></div>
@@ -1316,12 +1291,11 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
       <h4 style="margin:0;color:var(--navy);font-size:17px;font-weight:700;">&#9881; Select Configuration</h4>
       <button onclick="closeTabCfgPicker()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#64748b;line-height:1;">&times;</button>
     </div>
-    <input type="text" id="tcfg-search" placeholder="&#128269; Search config (e.g. C5, Config 12)..." oninput="renderTabCfgGrid()" style="padding:8px 12px;border:1px solid var(--border,#cbd5e1);border-radius:8px;font-size:13px;margin-bottom:10px;outline:none;width:100%;box-sizing:border-box;">
-    <div id="tcfg-grid" style="display:flex;flex-wrap:wrap;gap:6px;overflow-y:auto;flex:1;min-height:120px;max-height:400px;padding:8px;border:1px solid var(--border,#cbd5e1);border-radius:8px;align-content:flex-start;"></div>
+    <input type="text" id="tcfg-search" placeholder="&#128269; Search config (e.g. C5, Config 12)..." oninput="_tcfgPage=1;renderTabCfgGrid()" style="padding:8px 12px;border:1px solid var(--border,#cbd5e1);border-radius:8px;font-size:13px;margin-bottom:10px;outline:none;width:100%;box-sizing:border-box;">
+    <p>All means all configurations saved on the Configurations page.</p><div class="pager"><button id="tcfg-prev" class="btn-sm btn-outline" onclick="tabCfgPage(-1)">← Prev</button><span id="tcfg-page-info" aria-live="polite"></span><button id="tcfg-next" class="btn-sm btn-outline" onclick="tabCfgPage(1)">Next →</button></div><div id="tcfg-grid" style="display:flex;flex-wrap:wrap;gap:6px;overflow-y:auto;flex:1;min-height:120px;max-height:400px;padding:8px;border:1px solid var(--border,#cbd5e1);border-radius:8px;align-content:flex-start;"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--border,#e2e8f0);">
       <button class="btn-sm" style="background:#64748b;color:#fff;" onclick="closeTabCfgPicker()">Cancel</button>
       <button class="btn-sm" style="background:#059669;color:#fff;" onclick="saveTabCfgPicker()">&#128190; Save</button>
-      <button class="btn-sm" style="background:#1d4ed8;color:#fff;" onclick="applyTabCfgPicker()">&#10003; Apply Filter</button>
     </div>
   </div>
 </div>
@@ -1492,10 +1466,10 @@ function cfgBadge(cfg){
 
 // ─── TABS ─────────────────────────────────────────────────────────────────────
 function showTab(name,el){
-  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
+  document.querySelectorAll('[id^="tab-"]:not(#tab-cfg-picker-modal)').forEach(t=>t.classList.add('hidden'));
   const _tp=document.getElementById('tab-'+name);if(_tp)_tp.classList.remove('hidden');else{console.warn('tab-'+name+' panel missing');return;}
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   if(name==='overview') buildOverview();
   else if(name==='open')    renderTab('open');
   else if(name==='closed')  renderTab('closed');
@@ -1513,7 +1487,7 @@ function showTab(name,el){
   else if(name==='portfolio')   renderPortfolio();
   else if(name==='fno')         renderTab('fno');
   else if(name==='fnoclosed')   renderTab('fnoclosed');
-  else if(name==='configs')    { document.getElementById('cfg-params-table').querySelector('tbody').innerHTML=buildCfgParamsRows(); renderConfigsPage();  }
+  else if(name==='configs') beginConfigsPage();
   else if(name==='uniopen')     renderTab('uniopen');
   else if(name==='uniclosed')   renderTab('uniclosed');
   else if(name==='unifno')      renderTab('unifno');
@@ -1552,47 +1526,13 @@ var _tcfgActiveTab = null;
 var _tcfgTempVal   = 'ALL';
 var _tcfgSaved     = (function(){ try{return JSON.parse(localStorage.getItem('btst_tcfg_saved')||'{}');}catch(e){return {};} })();
 
-function openTabCfgPicker(tab){
-  _tcfgActiveTab = tab;
-  _tcfgTempVal   = (state[tab]||{}).cfg || 'ALL';
-  var si = document.getElementById('tcfg-search');
-  if(si) si.value='';
-  renderTabCfgGrid();
-  var m = document.getElementById('tab-cfg-picker-modal');
-  if(m) m.style.display='flex';
-}
 
-function renderTabCfgGrid(){
-  var q = ((document.getElementById('tcfg-search')||{}).value||'').toLowerCase();
-  var grid = document.getElementById('tcfg-grid');
-  if(!grid) return;
-  var html = '<button class="btn-filter '+(_tcfgTempVal==='ALL'?'active':'')+'" style="font-weight:700;" onclick="_tcfgTempVal=\'ALL\';renderTabCfgGrid()">All</button>';
-  CONFIGS_DEF.filter(function(c){
-    if(!q) return true;
-    var id=(c.id||c.ID||'').toLowerCase();
-    var nm=(c.name||'').toLowerCase();
-    return id.includes(q)||nm.includes(q);
-  }).forEach(function(c){
-    var id=c.id||c.ID;
-    html+='<button class="btn-filter '+(_tcfgTempVal===id?'active':'')+'" style="min-width:46px;" onclick="_tcfgTempVal=\''+id+'\';renderTabCfgGrid()">'+id+'</button>';
-  });
-  grid.innerHTML=html;
-}
 
-function applyTabCfgPicker(){
-  var tab=_tcfgActiveTab;
-  closeTabCfgPicker();
-  if(!tab) return;
-  cfgFilter(tab, _tcfgTempVal, null);
-}
 
-function saveTabCfgPicker(){
-  if(_tcfgActiveTab){
-    _tcfgSaved[_tcfgActiveTab]=_tcfgTempVal;
-    try{ localStorage.setItem('btst_tcfg_saved',JSON.stringify(_tcfgSaved)); }catch(e){}
-  }
-  applyTabCfgPicker();
-}
+
+
+
+
 
 function closeTabCfgPicker(){
   var m=document.getElementById('tab-cfg-picker-modal');
@@ -3124,7 +3064,8 @@ function buildOverview(){
     totPnl+=pnl; totPT+=profitTrades.length; totLoss+=lossTrades.length;
   });
 
-  document.getElementById('ov-body').innerHTML=rows.join('');
+  renderOverviewPager(rows.length);
+  document.getElementById('ov-body').innerHTML=rows.slice((_ovPage-1)*_ovPageSize,_ovPage*_ovPageSize).join('');
   const totWr=totPT+totLoss>0?(totPT/(totPT+totLoss)*100).toFixed(1)+'%':'—';
 
   let totalSigsFiltered = ovCfg==='ALL' ? ALL_ROWS : ALL_ROWS.filter(r=>r.CONFIG===ovCfg);
@@ -3632,56 +3573,14 @@ async function portfolioManualAdd() {
 var _cfgSelTemp = new Set();
 var _cfgTabActive = 'ALL';
 
-function openCfgSelectModal(){
-  _cfgSelTemp = new Set();
-  var saved = localStorage.getItem('btst_cfg_active_v2');
-  if(!saved || saved === 'ALL'){
-    CONFIGS_DEF.forEach(function(c){ _cfgSelTemp.add(c.id); });
-  } else {
-    saved.split(',').forEach(function(id){ _cfgSelTemp.add(id.trim()); });
-  }
-  updateCfgSelGrid();
-  var m = document.getElementById('cfg-select-modal');
-  if(m){ m.style.display='flex'; }
-}
-function closeCfgSelectModal(){
-  var m = document.getElementById('cfg-select-modal');
-  if(m){ m.style.display='none'; }
-}
-function updateCfgSelGrid(){
-  var allBtns = Array.from(document.querySelectorAll('.cfg-sel-btn'));
-  allBtns.forEach(function(b){
-    var sel = _cfgSelTemp.has(b.dataset.id);
-    b.style.background = sel ? 'var(--navy)' : 'transparent';
-    b.style.color = sel ? '#fff' : 'var(--text2)';
-    b.style.borderColor = sel ? 'var(--navy)' : 'var(--border)';
-  });
-  var count = _cfgSelTemp.size;
-  var total = allBtns.length;
-  var el = document.getElementById('cfg-sel-count');
-  if(el) el.textContent = count + ' of ' + total + ' selected';
-}
-function cfgSelToggle(id){
-  if(_cfgSelTemp.has(id)) _cfgSelTemp.delete(id);
-  else _cfgSelTemp.add(id);
-  updateCfgSelGrid();
-}
-function cfgSelAll(){ CONFIGS_DEF.forEach(function(c){ _cfgSelTemp.add(c.id); }); updateCfgSelGrid(); }
-function cfgSelClear(){ _cfgSelTemp.clear(); updateCfgSelGrid(); }
 
-function applyCfgSelect(){
-  var allIds = CONFIGS_DEF.map(function(c){ return c.id; });
-  if(_cfgSelTemp.size === 0 || _cfgSelTemp.size === allIds.length){
-    _cfgTabActive = 'ALL';
-  } else if(_cfgSelTemp.size === 1){
-    _cfgTabActive = Array.from(_cfgSelTemp)[0];
-  } else {
-    _cfgTabActive = Array.from(_cfgSelTemp).join(',');
-  }
-  localStorage.setItem('btst_cfg_active_v2', _cfgTabActive);
-  closeCfgSelectModal();
-  reloadDataForConfigs();
-}
+
+
+
+
+
+
+
 
 // Bounded data loader: do not start one network request per configuration.
 var _btstLoadVersion = 0;
@@ -3781,7 +3680,7 @@ function reloadDataForConfigs(){
       buildOverview();
       renderConfigsPage();
       var activeTab = document.querySelector('.tab.active');
-      if(activeTab){ var tabName = activeTab.getAttribute('data-tab'); if(tabName) renderTab(tabName); }
+      if(activeTab){ var match=(activeTab.getAttribute('onclick')||'').match(/showTab\('([^']+)'/);var tabName=activeTab.getAttribute('data-tab')||(match&&match[1]);if(tabName&&tabName!=='overview'&&tabName!=='configs')showTab(tabName,activeTab); }
       if(banner) banner.innerHTML = totalSignals > 0 
         ? '&#10003; Data loaded: ' + totalSignals + ' signals'
         : '<span style="color:#d97706">&#9888; No trade data found. Run the Generate Signal workflow first.</span>';
@@ -3818,42 +3717,8 @@ function buildCfgParamsRows(){
       +'</tr>';
   }).join('');
 }
-function renderConfigsPage(){
-  // Build rows if empty
-  var tbody=document.getElementById('cfg-params-body');
-  if(tbody&&!tbody.children.length) tbody.innerHTML=buildCfgParamsRows();
-  var pgSzEl=document.getElementById('configs-pgsize');
-  var pgSz=pgSzEl?parseInt(pgSzEl.value):25;
-  var allRows=Array.from(document.querySelectorAll('#cfg-params-table tbody tr'));
-  var filtered=allRows.filter(function(tr){
-    if(_cfgTabActive==='ALL'||_cfgTabActive==='') return true;
-    if(_cfgTabActive.includes(',')){
-      var ids=_cfgTabActive.split(',');
-      var cfg=tr.children[0]?tr.children[0].textContent.trim():'';
-      return ids.includes(cfg);
-    }
-    var cfg=tr.children[0]?tr.children[0].textContent.trim():'';
-    return cfg===_cfgTabActive;
-  });
-  var page=window._cfgPage||1;
-  var total=filtered.length;
-  var pages=Math.max(1,Math.ceil(total/pgSz));
-  if(page>pages) page=1;
-  window._cfgPage=page;
-  var start=(page-1)*pgSz;
-  allRows.forEach(function(tr){tr.style.display='none';});
-  filtered.slice(start,start+pgSz).forEach(function(tr){tr.style.display='';});
-  var info=document.getElementById('configs-page-info');
-  if(info) info.textContent='Page '+page+' of '+pages+' ('+total+' total)';
-  var prev=document.getElementById('configs-prev');
-  var next=document.getElementById('configs-next');
-  if(prev) prev.disabled=page<=1;
-  if(next) next.disabled=page>=pages;
-}
-function configsChangePage(delta){
-  window._cfgPage=(window._cfgPage||1)+delta;
-  renderConfigsPage();
-}
+
+
 
 function showPATModal() {
   document.getElementById('pat-modal').classList.remove('hidden');
@@ -3938,63 +3803,120 @@ function exportPortfolioExcel() {
 
 
 /* === CONFIG SELECTION MODAL === */
-function initCfgModal(){
-  var grid=document.getElementById('cfg-grid');
-  CONFIGS_DEF.forEach(function(cfg){
-    var chk=document.createElement('label');
-    chk.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;user-select:none;';
-    chk.innerHTML='<input type="checkbox" id="cfg-'+cfg.id+'" value="'+cfg.id+'" style="width:16px;height:16px;cursor:pointer;"> '+cfg.name;
-    grid.appendChild(chk);
-  });
-  loadCfgSelection();
-}
 
-function loadCfgSelection(){
-  var saved=JSON.parse(localStorage.getItem('btst_sel_cfgs_v2')||'null');
-  if(!saved || saved.length===0){
-    saved=CONFIGS_DEF.map(function(c){return c.id;});
-  }
-  saved.forEach(function(id){
-    var chk=document.getElementById('cfg-'+id);
-    if(chk) chk.checked=true;
-  });
-}
 
-function selectAllCfgs(){
-  CONFIGS_DEF.forEach(function(cfg){
-    var chk=document.getElementById('cfg-'+cfg.id);
-    if(chk) chk.checked=true;
-  });
-}
 
-function clearAllCfgs(){
-  CONFIGS_DEF.forEach(function(cfg){
-    var chk=document.getElementById('cfg-'+cfg.id);
-    if(chk) chk.checked=false;
-  });
-}
 
-function applyCfgSelection(){
-  var selected=[];
-  CONFIGS_DEF.forEach(function(cfg){
-    var chk=document.getElementById('cfg-'+cfg.id);
-    if(chk && chk.checked) selected.push(cfg.id);
-  });
-  if(selected.length===0){ alert('Please select at least one configuration.'); return; }
-  localStorage.setItem('btst_sel_cfgs_v2',JSON.stringify(selected));
-  document.getElementById('cfg-modal').style.display='none';
-  location.reload();
-}
+
+
+
+
+
 
 
 </script>
-    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
-      <button onclick="selectAllCfgs()" style="padding:10px 20px;border:1px solid #ccc;background:#f5f5f5;border-radius:6px;cursor:pointer;font-weight:600;">Select All</button>
-      <button onclick="clearAllCfgs()" style="padding:10px 20px;border:1px solid #ccc;background:#f5f5f5;border-radius:6px;cursor:pointer;font-weight:600;">Clear All</button>
-      <button onclick="applyCfgSelection()" style="padding:10px 20px;background:#0d1f3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;">Apply & Load</button>
-    </div>
-  </div>
-</div>
+<script>
+var _configDraft=null, _cfgPage=1, _ovPage=1, _ovPageSize=25, _tcfgPage=1;
+function configId(c){return c.id||c.ID;}
+function configEscape(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function savedConfigIds(){return _cfgTabActive==='ALL'?CONFIGS_DEF.map(configId):_cfgTabActive.split(',').filter(Boolean);}
+function availableConfigDefs(){var ids=new Set(savedConfigIds());return CONFIGS_DEF.filter(function(c){return ids.has(configId(c));});}
+function beginConfigsPage(){
+  _configDraft=new Set(savedConfigIds());_cfgPage=1;
+  var search=document.getElementById('configs-search');if(search)search.value='';
+  document.getElementById('config-save-status').textContent='Changes are not saved until you click Save Selection.';
+  renderConfigsPage();
+}
+function configDraftAll(checked){_configDraft=checked?new Set(CONFIGS_DEF.map(configId)):new Set();renderConfigsPage();}
+function configDraftToggle(id,checked){if(!_configDraft)beginConfigsPage();if(checked)_configDraft.add(id);else _configDraft.delete(id);updateConfigDraftCount();}
+function updateConfigDraftCount(){var el=document.getElementById('config-selected-count');if(el)el.textContent=(_configDraft?_configDraft.size:0)+' / '+CONFIGS_DEF.length+' selected';}
+function renderConfigsPage(){
+  if(!_configDraft)_configDraft=new Set(savedConfigIds());
+  var query=(document.getElementById('configs-search').value||'').toLowerCase();
+  var configs=CONFIGS_DEF.filter(function(c){return (configId(c)+' '+(c.name||'')).toLowerCase().includes(query);});
+  var size=parseInt(document.getElementById('configs-pgsize').value)||25;
+  var pages=Math.max(1,Math.ceil(configs.length/size));_cfgPage=Math.max(1,Math.min(_cfgPage,pages));
+  var fields=[['days_back','DAYS_BACK'],['pct_min','PCT_MIN'],['pct_max','PCT_MAX'],['ath_min','ATH_MIN','ath_drop_min'],['ath_max','ATH_MAX','ath_drop_max'],['max_buys','MAX_BUYS'],['buy_drop','BUY_DROP'],['target','TARGET'],['stoploss','stop_loss','STOP_LOSS','sl'],['max_duration','MAX_DURATION']];
+  document.getElementById('cfg-params-body').innerHTML=configs.slice((_cfgPage-1)*size,_cfgPage*size).map(function(c){
+    var id=configId(c),safe=configEscape(id);
+    return '<tr><td><input type="checkbox" aria-label="Select '+safe+'" '+(_configDraft.has(id)?'checked':'')+' onchange="configDraftToggle(this.value,this.checked)" value="'+safe+'"></td><td>'+safe+'</td>'+fields.map(function(keys){var key=keys.find(function(k){return c[k]!=null;});return '<td>'+configEscape(key?c[key]:'—')+'</td>';}).join('')+'</tr>';
+  }).join('')||'<tr><td colspan="12">No configurations match your search.</td></tr>';
+  document.getElementById('configs-page-info').textContent='Page '+_cfgPage+' of '+pages+' · '+configs.length+' configurations';
+  document.getElementById('configs-prev').disabled=_cfgPage<=1;document.getElementById('configs-next').disabled=_cfgPage>=pages;
+  updateConfigDraftCount();updateSavedConfigLabel();
+}
+function configsChangePage(delta){_cfgPage+=delta;renderConfigsPage();}
+function updateSavedConfigLabel(){var el=document.getElementById('saved-config-summary');if(el)el.textContent=savedConfigIds().length+' / '+CONFIGS_DEF.length+' configurations saved';}
+function cancelConfigsPage(){_configDraft=null;beginConfigsPage();document.getElementById('config-save-status').textContent='Unsaved changes discarded. Your saved selection is unchanged.';}
+function saveConfigsPage(){
+  if(!_configDraft||!_configDraft.size){document.getElementById('config-save-status').textContent='Select at least one configuration before saving.';return;}
+  var ids=CONFIGS_DEF.map(configId).filter(function(id){return _configDraft.has(id);});
+  var next=ids.length===CONFIGS_DEF.length?'ALL':ids.join(','),changed=next!==_cfgTabActive;
+  try{localStorage.setItem('btst_cfg_active_v2',next);}catch(e){document.getElementById('config-save-status').textContent='Could not save in this browser. Your previous selection is unchanged.';return;}
+  _cfgTabActive=next;updateSavedConfigLabel();
+  // Reset tab choices that no longer belong to the saved loading scope.
+  var allowed=new Set(ids);configFilterTabs().forEach(function(tab){if(getPageConfig(tab)!=='ALL'&&!allowed.has(getPageConfig(tab)))assignPageConfig(tab,'ALL');syncPageConfigLabel(tab);});
+  document.getElementById('config-save-status').textContent='Selection saved. '+ids.length+' configurations selected.';
+  _ovPage=1;if(changed)reloadDataForConfigs();
+}
+function openCfgSelectModal(){var el=Array.from(document.querySelectorAll('.tab')).find(function(b){return (b.getAttribute('onclick')||'').includes("'configs'");});showTab('configs',el);}
+function closeCfgSelectModal(){cancelConfigsPage();}
+function applyCfgSelect(){saveConfigsPage();}
+function configFilterTabs(){return ['overview','open','closed','fno','fnoclosed','fe','hist','ledger','trades','signals','avgtrigger','selltrigger','avghistory','marketdata','performance'];}
+function getPageConfig(tab){
+  if(tab==='overview')return ovCfg;if(tab==='signals')return sigCfg;if(tab==='avgtrigger')return avgTrigCfg;
+  if(tab==='selltrigger')return sellTrigCfg;if(tab==='avghistory')return avgHistCfg;if(tab==='performance')return perfCfg;
+  return (state[tab]||{}).cfg||'ALL';
+}
+function assignPageConfig(tab,value){
+  if(tab==='overview'){ovCfg=value;_ovPage=1;}else if(tab==='signals'){sigCfg=value;state.signals.page=1;}
+  else if(tab==='avgtrigger'){avgTrigCfg=value;state.avgtrigger.page=1;}else if(tab==='selltrigger'){sellTrigCfg=value;state.selltrigger.page=1;}
+  else if(tab==='avghistory'){avgHistCfg=value;state.avghistory.page=1;}else if(tab==='performance'){perfCfg=value;}
+  else{if(!state[tab])state[tab]={};state[tab].cfg=value;state[tab].page=1;}
+}
+function syncPageConfigLabel(tab){
+  var val=getPageConfig(tab),all=document.getElementById('cfgf-'+tab+'-all'),choose=document.getElementById('cfgf-'+tab+'-sel'),badge=document.getElementById('cfgf-'+tab+'-badge');
+  if(all)all.classList.toggle('active',val==='ALL');if(choose){choose.textContent=val==='ALL'?'Choose Configuration':'Configuration: '+val;choose.classList.toggle('active',val!=='ALL');}
+  if(badge)badge.style.display='none';
+}
+function setPageConfig(tab,value){
+  assignPageConfig(tab,value);syncPageConfigLabel(tab);
+  if(tab==='overview')buildOverview();else if(tab==='hist')buildHistory();else if(tab==='avgtrigger')renderAvgTrigger();else if(tab==='selltrigger')renderSellTrigger();else if(tab==='avghistory')renderAvgHistory();else if(tab==='marketdata')renderMarketData();else if(tab==='performance')renderPerformance();else renderTab(tab);
+}
+function openTabCfgPicker(tab){
+  _tcfgActiveTab=tab;_tcfgTempVal=getPageConfig(tab);_tcfgPage=1;
+  document.getElementById('tcfg-search').value='';renderTabCfgGrid();
+  var modal=document.getElementById('tab-cfg-picker-modal');modal.classList.remove('hidden');modal.style.display='flex';
+}
+function renderTabCfgGrid(){
+  var query=(document.getElementById('tcfg-search').value||'').toLowerCase(),grid=document.getElementById('tcfg-grid');
+  var configs=availableConfigDefs().filter(function(c){return (configId(c)+' '+(c.name||'')).toLowerCase().includes(query);});
+  var pages=Math.max(1,Math.ceil(configs.length/60));_tcfgPage=Math.max(1,Math.min(_tcfgPage,pages));
+  grid.innerHTML='<button class="btn-filter '+(_tcfgTempVal==='ALL'?'active':'')+'" onclick="_tcfgTempVal=\'ALL\';renderTabCfgGrid()">All Saved Configurations</button>'+configs.slice((_tcfgPage-1)*60,_tcfgPage*60).map(function(c){var id=configId(c);return '<button class="btn-filter '+(_tcfgTempVal===id?'active':'')+'" data-config="'+configEscape(id)+'" onclick="_tcfgTempVal=this.dataset.config;renderTabCfgGrid()">'+configEscape(id)+'</button>';}).join('');
+  document.getElementById('tcfg-page-info').textContent='Page '+_tcfgPage+' of '+pages+' · '+configs.length+' available · Selected: '+_tcfgTempVal;
+  document.getElementById('tcfg-prev').disabled=_tcfgPage<=1;document.getElementById('tcfg-next').disabled=_tcfgPage>=pages;
+}
+function tabCfgPage(delta){_tcfgPage+=delta;renderTabCfgGrid();}
+function applyTabCfgPicker(){var tab=_tcfgActiveTab,val=_tcfgTempVal;closeTabCfgPicker();if(tab)setPageConfig(tab,val);}
+function saveTabCfgPicker(){
+  var tab=_tcfgActiveTab;if(!tab)return;
+  var next=Object.assign({},_tcfgSaved);next[tab]=_tcfgTempVal;
+  try{localStorage.setItem('btst_tcfg_saved',JSON.stringify(next));}catch(e){alert('Could not save this filter. Please check browser storage.');return;}
+  _tcfgSaved=next;applyTabCfgPicker();
+}
+function overviewChangePage(delta){_ovPage+=delta;buildOverview();}
+function overviewPageSize(value){_ovPageSize=parseInt(value)||25;_ovPage=1;buildOverview();}
+function renderOverviewPager(total){
+  var pages=Math.max(1,Math.ceil(total/_ovPageSize));_ovPage=Math.max(1,Math.min(_ovPage,pages));
+  document.getElementById('overview-page-info').textContent='Page '+_ovPage+' of '+pages+' · '+total+' configurations · Summary covers all filtered configurations';
+  document.getElementById('overview-prev').disabled=_ovPage<=1;document.getElementById('overview-next').disabled=_ovPage>=pages;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var allowed=new Set(savedConfigIds());
+  configFilterTabs().forEach(function(tab){var value=_tcfgSaved[tab]||'ALL';assignPageConfig(tab,value==='ALL'||allowed.has(value)?value:'ALL');syncPageConfigLabel(tab);});
+  updateSavedConfigLabel();
+});
 
+</script>
 </body>
 </html>
